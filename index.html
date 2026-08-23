@@ -5289,4 +5289,19 @@ window.bootApp=bootApp;
 </script>
 
 </body>
+  <script>
+  document.addEventListener('alpine:init', () => {
+    Alpine.data('reconciliationApp', () => ({
+      items: [],
+      async init() {
+        const { data, error } = await supabaseClient
+          .from('subledger_items')
+          .select('*');
+        if (!error && data) {
+          this.items = data;
+        }
+      }
+    }));
+  });
+</script>
 </html>
