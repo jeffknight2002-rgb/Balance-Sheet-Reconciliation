@@ -5296,7 +5296,7 @@ function showManualLogin(){
 }
 
 async function bootApp(isReturning){
-  console.log('bootApp called, isAdm:', isAdm, 'CURRENT_USER:', CURRENT_USER?.name);
+  const isAdm = CURRENT_USER?.role === 'admin' || CURRENT_USER?.isAdm === true;
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='flex';
   applyLoginUI();
