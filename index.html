@@ -1880,6 +1880,8 @@ function applyLoginUI(){
   document.getElementById('navAdminSec').style.display=isAdm?'':'none';
   document.getElementById('navAutoCert').style.display='';
 }
+let CURRENT_USER = null;
+let SEL_ROLE = '';
 let AUTH_MODE = 'signin'; // 'signin' | 'signup'
 async function ssoLogin(provider){
   if(!sb){ showLoginErr('Supabase is not configured yet — see SETUP.md.'); return; }
