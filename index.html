@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -812,6 +813,11 @@ button{cursor:pointer}
 
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 <script>
+
+
+
+
+
 
 
 
@@ -5258,32 +5264,13 @@ window.addEventListener('DOMContentLoaded', async function(){
   RD.forEach(function(r){
     if(!ST[r.id]) ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[],returnHistory:[]};
   });
-  // Check for existing Supabase session
+  // Always sign out any existing Supabase session on page load
+  // Each user must explicitly log in every time
   try {
     const sbClient = getSb();
-    if(sbClient){
-      const { data:{ session } } = await sbClient.auth.getSession();
-      if(session){
-        const USER_MAP = {
-  'jeffknight2002@gmail.com': {name:'Jefferson Cafe', role:'admin',    initials:'JC'},
-  'kulasong@test.com':        {name:'Kula Song',      role:'preparer', initials:'KS'},
-  'tester1@gmail.com':        {name:'Tester One',     role:'preparer', initials:'T1'},
-  'tester2@gmail.com':        {name:'Tester Two',     role:'preparer', initials:'T2'},
-  'tester3@gmail.com':        {name:'Tester Three',   role:'reviewer', initials:'T3'},
-  'tester4@gmail.com':        {name:'Tester Four',    role:'reviewer', initials:'T4'},
-  'tester5@gmail.com':        {name:'Tester Five',    role:'approver', initials:'T5'},
-};
-        const profile = USER_MAP[session.user.email.toLowerCase()];
-        if(profile){
-          const avCls = {preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
-          CURRENT_USER = { name:profile.name, role:profile.role, email:session.user.email, initials:profile.initials, avCls };
-          await bootApp(true);
-          return;
-        }
-      }
-    }
-  } catch(e){ console.warn('Session restore failed:', e.message); }
-  // No session — show login
+    if(sbClient){ await sbClient.auth.signOut(); }
+  } catch(e){}
+  // Always show login screen
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainApp').style.display='none';
 });
@@ -5486,6 +5473,11 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
+
+
+
 
 
 
