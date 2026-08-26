@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +8,19 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+// Initialize Supabase immediately after CDN loads (synchronous)
+(function(){
+  var SURL = 'https://bpfoixwlqjliexuaguwy.supabase.co';
+  var SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s';
+  if(typeof window.supabase !== 'undefined'){
+    window._sb = window.supabase.createClient(SURL, SKEY);
+    console.log('[Supabase] Initialized synchronously ✓');
+  } else {
+    console.error('[Supabase] CDN not loaded!');
+  }
+})();
+</script>
 <style>
 :root{
   --navy:#1B3A5C;--navy2:#16324F;
@@ -814,6 +828,7 @@ button{cursor:pointer}
 
 
 
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -843,23 +858,22 @@ const SUPABASE_CONFIG = {
 };
 let _sb = null;
 function getSb(){
+  // Use pre-initialized client from <head> script
+  if(window._sb) return window._sb;
   if(_sb) return _sb;
   if(typeof window.supabase !== 'undefined' && window.supabase.createClient){
     _sb = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-    console.log('[Supabase] Client initialized ✓');
-    return _sb;
+    window._sb = _sb;
+    console.log('[Supabase] Client initialized in getSb() ✓');
   }
-  console.warn('[Supabase] window.supabase not ready yet');
-  return null;
+  return _sb || null;
 }
 async function getSbAsync(maxWait=5000){
-  if(getSb()) return _sb;
+  if(getSb()) return getSb();
   const start = Date.now();
   while(Date.now()-start < maxWait){
     await new Promise(r=>setTimeout(r,100));
-    if(typeof window.supabase !== 'undefined' && window.supabase.createClient){
-      return getSb();
-    }
+    if(getSb()) return getSb();
   }
   console.error('[Supabase] Timeout waiting for client');
   return null;
@@ -5473,6 +5487,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
