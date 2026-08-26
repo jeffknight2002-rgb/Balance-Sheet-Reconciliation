@@ -804,6 +804,8 @@ button{cursor:pointer}
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 <script>
 
+
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -5159,61 +5161,15 @@ async function bootApp(isReturning){
 
 // Auto-login exposed globally so boot script can call it
 window.addEventListener('DOMContentLoaded', function(){
-  AZ_MODE=false;
-  SEL_ROLE='admin';
-  CURRENT_USER={name:'Admin',email:'admin@accenture.com',role:'admin',initials:'AD',avCls:'av-adm'};
-  isAdm=true; isPrep=false; isRev=false; isApp=false;
-
-  // Hide login, show app
-  document.getElementById('loginScreen').style.display='none';
-  document.getElementById('mainApp').style.display='flex';
-
-  // Init
-  applyLoginUI();
-  initDropdowns();
-  // Initialize ST for all recs so dashboard shows them
+  // Initialize default ST for all recs
   RD.forEach(function(r){
-    if(!ST[r.id]) ST[r.id]={
-      status:'open', openItems:[], comments:[], auditLog:[],
-      certStmt:'', certNotes:'', chks:[false,false,false],
-      attachments:[], links:[], wfEvents:[], returnHistory:[]
-    };
+    if(!ST[r.id]) ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[],returnHistory:[]};
   });
-
-  // Force all filters to ALL
-  F={risk:'ALL',status:'ALL',fsli:'ALL',are:'ALL',q:'',oiage:'ALL'};
-  ZERO_BAL_ONLY=false; CURRENT_ENTITY=null; CURRID=null;
-  var da=document.getElementById('dAre');  if(da)  da.value='ALL';
-  var df=document.getElementById('dFsli'); if(df)  df.value='ALL';
-  var ds=document.getElementById('dSrch'); if(ds)  ds.value='';
-
-  // Admin setup
-  initAdminDropdowns();
-  renderUserRoster();
-  renderAssign();
-  updateAssignProg();
-  updateRoleUI();
-
-  // Render dashboard
-  renderKpis();
-  renderDash();
-  updateNavBadges();
-
-  // Force page-dash on, everything else off
-  document.querySelectorAll('.page').forEach(function(p){
-    p.classList.remove('on');
-    p.style.display='none';
-  });
-  var dp=document.getElementById('page-dash');
-  if(dp){ dp.classList.add('on'); dp.style.display='flex'; }
-  var bc2=document.getElementById('bc2');
-  if(bc2) bc2.style.display='none';
-  document.querySelectorAll('.nav-lnk').forEach(function(n){n.classList.remove('on');});
-  var dashNav=document.querySelector('[data-pg="dash"]');
-  if(dashNav) dashNav.classList.add('on');
-  // TEST: auto-open ARE 3000
-  setTimeout(function(){ openRec('TRADE PAYABLES||3000'); }, 150);
+  // Always show login screen on fresh load
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('mainApp').style.display='none';
 });
+
 
 // Expose all functions globally
 window.getApiBase=getApiBase;
@@ -5412,6 +5368,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
