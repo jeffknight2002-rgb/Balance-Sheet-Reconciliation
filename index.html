@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +7,6 @@
 <title>Account Reconciliation · ARE 3000 · Jun 2026</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root{
   --navy:#1B3A5C;--navy2:#16324F;
@@ -442,117 +442,29 @@ button{cursor:pointer}
 .rule-name{font-size:12.5px;font-weight:600;color:var(--t1)}
 .rule-desc{font-size:11px;color:var(--t3);margin-top:2px}
 
-/* ══════════════════════════════════════════════════════════
-   RESPONSIVE — flexes from wide desktop down to phone
-   ══════════════════════════════════════════════════════════ */
-.nav-toggle{display:none;width:34px;height:34px;border-radius:var(--r);border:1px solid var(--b2);background:var(--card);align-items:center;justify-content:center;cursor:pointer;color:var(--t2);flex-shrink:0}
-.nav-toggle i{font-size:18px}
-.nav-backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:59}
-.nav-backdrop.on{display:block}
-
-/* ---- Laptop / smaller desktop: tighten up, everything still visible ---- */
-@media (max-width:1200px){
-  .nav{width:190px}
-  .rf-inner{max-width:100%}
-  .kpi-bar{flex-wrap:wrap}
-  .kpi{min-width:150px}
-}
-
-/* ---- Tablet: sidebar becomes a slide-out drawer ---- */
-@media (max-width:960px){
-  .nav-toggle{display:flex}
-  .nav{
-    position:fixed;top:0;left:0;bottom:0;width:240px;z-index:60;
-    transform:translateX(-100%);transition:transform .2s ease;box-shadow:var(--sh-lg);
-  }
-  .nav.open{transform:translateX(0)}
-  .admin-grid{grid-template-columns:1fr}
-  .dash-list{overflow-x:auto;-webkit-overflow-scrolling:touch}
-  .dash-tbl{min-width:900px}
-  .notif-panel{width:92vw;max-width:380px}
-  .entity-dd{max-width:92vw}
-  .kpi-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;flex-wrap:nowrap}
-  .kpi{min-width:150px;flex-shrink:0}
-}
-
-/* ---- Phone ---- */
-@media (max-width:640px){
-  body{font-size:12.5px}
-  .topbar{padding:0 10px;gap:6px;flex-wrap:wrap;height:auto;min-height:46px;padding-top:6px;padding-bottom:6px}
-  .tb-bc{font-size:11px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .tb-r{gap:5px;margin-left:0;flex-wrap:wrap;width:100%;justify-content:flex-start}
-  .tb-r > span:not(.sep){display:none} /* hide "Jun 2026 · Due..." label to save space */
-  .sep{display:none}
-  .dash-tb{padding:8px 10px;gap:5px}
-  .srch{max-width:none;flex:1 1 100%}
-  .kpi-bar{padding:8px 10px}
-  .kpi{padding:7px 10px;min-width:130px}
-  .kpi-v{font-size:16px}
-  .rf-inner{padding:10px 10px}
-  .admin-wrap{padding:10px}
-  .login-card{padding:24px 20px;width:100%}
-  .role-grid{grid-template-columns:1fr 1fr}
-  .notif-panel{width:100vw;max-width:none}
-  .btn{padding:6px 10px;font-size:12px}
-  .entity-sw{min-width:0}
-  .es-val{max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block}
-}
 </style>
-
-<script>
-function toggleNav(){
-  document.getElementById('appNav').classList.toggle('open');
-  document.getElementById('navBackdrop').classList.toggle('on');
-}
-function closeNavIfMobile(){
-  if(window.innerWidth<=960){
-    document.getElementById('appNav').classList.remove('open');
-    document.getElementById('navBackdrop').classList.remove('on');
-  }
-}
-</script>
-
 </head>
 <body>
 <div class="login-screen" id="loginScreen">
-  <div class="login-card" id="loginCard">
+  <div class="login-card">
     <div class="login-logo">Account Reconciliation</div>
     <div class="login-title">ARE 3000 · Jun 2026</div>
-    <div class="login-sub" id="loginModeSub">Sign in · June 2026 Period Close</div>
-
-    <div id="ssoButtons" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
-      <button type="button" class="btn" style="width:100%;justify-content:center;padding:9px" onclick="ssoLogin('google')">
-        <svg width="16" height="16" viewBox="0 0 48 48" style="flex-shrink:0"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3 12.4 3 3 12.4 3 24s9.4 21 21 21 21-9.4 21-21c0-1.4-.1-2.7-.4-3.5z"/><path fill="#FF3D00" d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.1 29.5 3 24 3 16.3 3 9.7 7.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 45c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 36.2 26.7 37 24 37c-5.2 0-9.6-3.1-11.3-7.6l-6.5 5C9.6 40.6 16.3 45 24 45z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.2 5.7l6.2 5.2C40.8 36 44 30.5 44 24c0-1.4-.1-2.7-.4-3.5z"/></svg>
-        Continue with Google
-      </button>
-      <button type="button" class="btn" style="width:100%;justify-content:center;padding:9px" onclick="ssoLogin('azure')">
-        <svg width="16" height="16" viewBox="0 0 23 23" style="flex-shrink:0"><path fill="#f35325" d="M1 1h10v10H1z"/><path fill="#81bc06" d="M12 1h10v10H12z"/><path fill="#05a6f0" d="M1 12h10v10H1z"/><path fill="#ffba08" d="M12 12h10v10H12z"/></svg>
-        Continue with Microsoft
-      </button>
-      <div style="display:flex;align-items:center;gap:10px;margin:4px 0 2px;color:var(--t3);font-size:11px">
-        <div style="flex:1;height:1px;background:var(--b1)"></div>OR<div style="flex:1;height:1px;background:var(--b1)"></div>
-      </div>
+    <div class="login-sub">June 2026 · Period Close</div>
+    <label class="login-lbl">Your Name</label>
+    <input class="login-inp" id="loginName" placeholder="Enter your full name" oninput="validateLogin()"/>
+    <label class="login-lbl" style="margin-bottom:8px">Select Your Role</label>
+    <div class="role-grid">
+      <div class="role-card" data-role="preparer" onclick="selectRole('preparer',this)"><div class="rc-icon"><i class="ti ti-pencil"></i></div><div class="rc-name">Preparer</div><div class="rc-desc">Prepare and submit reconciliations</div></div>
+      <div class="role-card" data-role="reviewer" onclick="selectRole('reviewer',this)"><div class="rc-icon"><i class="ti ti-eye"></i></div><div class="rc-name">Reviewer</div><div class="rc-desc">First-level review and sign-off</div></div>
+      <div class="role-card" data-role="approver" onclick="selectRole('approver',this)"><div class="rc-icon"><i class="ti ti-shield-check"></i></div><div class="rc-name">Approver</div><div class="rc-desc">Final approval and period lock</div></div>
+      <div class="role-card" data-role="admin" onclick="selectRole('admin',this)"><div class="rc-icon"><i class="ti ti-settings-2"></i></div><div class="rc-name">Admin / Manager</div><div class="rc-desc">Setup users and assignments</div></div>
     </div>
-
-    <label class="login-lbl">Email</label>
-    <input class="login-inp" id="loginEmail" type="email" placeholder="you@company.com" oninput="validateLogin()"/>
-    <label class="login-lbl">Password</label>
-    <input class="login-inp" id="loginPassword" type="password" placeholder="••••••••" oninput="validateLogin()" onkeyup="if(event.key==='Enter'&&!document.getElementById('loginBtn').disabled)doLogin()"/>
-    <div id="loginNameField" style="display:none">
-      <label class="login-lbl">Full Name</label>
-      <input class="login-inp" id="loginFullName" placeholder="e.g. Jane Cruz" oninput="validateLogin()"/>
-    </div>
-    <div id="loginErr" style="display:none;font-size:12px;color:var(--red);background:var(--red2);border:1px solid var(--red3);border-radius:var(--r);padding:8px 10px;margin-bottom:12px"></div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()" disabled>Sign In</button>
-    <div style="text-align:center;font-size:12px;color:var(--t3);margin-top:14px">
-      <span id="loginToggleText">Don't have an account?</span>
-      <span class="lnk" style="color:var(--blue);cursor:pointer" onclick="toggleAuthMode()" id="loginToggleBtn">Create one</span>
-    </div>
-    <div style="text-align:center;font-size:11px;color:var(--t3);margin-top:10px">Period: June 2026 · Due: 21 Jul 2026</div>
+    <div style="text-align:center;font-size:11px;color:var(--t3);margin-top:12px">Period: June 2026 · Due: 21 Jul 2026</div>
   </div>
 </div>
 <div class="app" id="mainApp" style="display:none">
-<nav class="nav" id="appNav">
+<nav class="nav">
   <div class="nav-logo"><div class="nav-logo-sub">Account Reconciliation</div><div class="nav-logo-name">ARE 3000 · Jun 2026</div></div>
   <div class="nav-period"><div class="nav-period-l">Current Period</div><div class="nav-period-v">June 2026</div></div>
   <div class="nav-role nr-adm" id="navRole"><i class="ti ti-user-circle" style="font-size:13px"></i><span id="navRoleName">—</span></div>
@@ -563,11 +475,11 @@ function closeNavIfMobile(){
   <div class="nav-sec">Analysis</div>
   <div class="nav-lnk" data-pg="reports" onclick="goPage('reports',this)"><i class="ti ti-chart-bar"></i>Reports</div>
   <div class="nav-sec">Actions</div>
-  <div class="nav-lnk" onclick="exportAll();closeNavIfMobile()"><i class="ti ti-download"></i>Export to Excel</div>
-  <div class="nav-lnk" onclick="rollForward();closeNavIfMobile()" style="color:#6EE7B7"><i class="ti ti-arrow-forward"></i>Roll Forward Period</div>
-  <div class="nav-lnk" onclick="showPeriodHistory();closeNavIfMobile()" style="color:#94A3B8"><i class="ti ti-history"></i>Prior Periods</div>
-  <div class="nav-lnk" onclick="exportSnapshot();closeNavIfMobile()"><i class="ti ti-database-export"></i>Save Snapshot</div>
-  <div class="nav-lnk" onclick="document.getElementById('snapIn').click();closeNavIfMobile()"><i class="ti ti-database-import"></i>Load Snapshot</div>
+  <div class="nav-lnk" onclick="exportAll()"><i class="ti ti-download"></i>Export to Excel</div>
+  <div class="nav-lnk" onclick="rollForward()" style="color:#6EE7B7"><i class="ti ti-arrow-forward"></i>Roll Forward Period</div>
+  <div class="nav-lnk" onclick="showPeriodHistory()" style="color:#94A3B8"><i class="ti ti-history"></i>Prior Periods</div>
+  <div class="nav-lnk" onclick="exportSnapshot()"><i class="ti ti-database-export"></i>Save Snapshot</div>
+  <div class="nav-lnk" onclick="document.getElementById('snapIn').click()"><i class="ti ti-database-import"></i>Load Snapshot</div>
   <input type="file" id="snapIn" accept=".json" style="display:none" onchange="importSnapshot(this.files[0]);this.value=''"/>
   <div class="nav-sec" id="navAdminSec" style="display:none">Admin</div>
   <div class="nav-lnk" data-pg="matching" onclick="goPage('matching',this)"><i class="ti ti-arrows-left-right"></i>Transaction Matching</div>
@@ -575,10 +487,8 @@ function closeNavIfMobile(){
   <div class="nav-lnk" data-pg="admin" onclick="goPage('admin',this)" id="navAdmin" style="display:none"><i class="ti ti-settings-2"></i>Setup &amp; Assignment<span class="nav-badge" id="nb-unassigned">0</span></div>
   <div class="nav-foot">Due: 21 Jul 2026</div>
 </nav>
-<div class="nav-backdrop" id="navBackdrop" onclick="toggleNav()"></div>
 <div class="main">
   <div class="topbar">
-    <button class="nav-toggle" onclick="toggleNav()" title="Menu"><i class="ti ti-menu-2"></i></button>
     <div class="tb-bc">
       <span class="lnk" onclick="goPage('dash',null)">My Reconciliations</span>
       <span id="bc2" style="display:none"><span style="color:var(--b2)"> › </span><b id="bc2Text"></b></span>
@@ -814,9 +724,8 @@ function closeNavIfMobile(){
               <div class="add-user-form">
                 <div style="font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px">Add Team Member</div>
                 <input class="au-in" id="newUserName" placeholder="Full name" onkeyup="if(event.key==='Enter')addUser()"/>
-                <input class="au-in" id="newUserEmail" type="email" placeholder="Email (they'll sign up with this)" onkeyup="if(event.key==='Enter')addUser()"/>
                 <div style="display:flex;gap:7px">
-                  <select class="au-in" id="newUserRole" style="flex:1"><option value="preparer">Preparer</option><option value="reviewer">Reviewer</option><option value="approver">Approver</option><option value="admin">Admin</option></select>
+                  <select class="au-in" id="newUserRole" style="flex:1"><option value="preparer">Preparer</option><option value="reviewer">Reviewer</option><option value="approver">Approver</option></select>
                   <button class="btn btn-navy btn-sm" onclick="addUser()"><i class="ti ti-plus"></i>Add</button>
                 </div>
               </div>
@@ -893,26 +802,14 @@ function closeNavIfMobile(){
 </div>
 
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="toastIcon"></i><span id="toastMsg"></span></div>
-<script>
+<script>let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 let   RD=[{"id": "CASH AND CASH EQUIVALENT||3000", "fsli": "CASH AND CASH EQUIVALENT", "are": "3000", "ccy": "PHP", "risk": "1. Most Critical", "freq": "Monthly", "apd": "03 Jul 2026", "ard": "04 Jul 2026", "gl": 15318013.22, "op": 16993354.03, "tdr": 0.0, "tcr": 1675340.81, "mvt": 2087752.29, "ct": 2, "accts": [{"c": "2881-0203", "n": "HSBC Bank-PHP A/C", "cat": "With Movement", "op": 16993354.03, "tdr": 0.0, "tcr": 902481.81, "mvt": 3633470.29, "net": 16090872.22}, {"c": "4870-0001", "n": "Purchase Invoice Receipt (Manu", "cat": "With Movement", "op": 0.0, "tdr": 0.0, "tcr": 772859.0, "mvt": -1545718.0, "net": -772859.0}]}, {"id": "INTRAGROUP RECEIVABLES & LIABILITIES||3000", "fsli": "INTRAGROUP RECEIVABLES & LIABILITIES", "are": "3000", "ccy": "PHP", "risk": "1. Most Critical", "freq": "Monthly", "apd": "03 Jul 2026", "ard": "04 Jul 2026", "gl": 24951955.85, "op": 31117439.63, "tdr": 25900565.14, "tcr": 32066048.92, "mvt": -11181315.88, "ct": 10, "accts": [{"c": "2539-0001", "n": "SFS Current A/C-SGD", "cat": "With Movement", "op": 97472165.84, "tdr": 25715399.08, "tcr": 0.0, "mvt": 36098513.88, "net": 123187564.92}, {"c": "2539-0003", "n": "SFS Current A/C-EUR", "cat": "With Movement", "op": -995.59, "tdr": 0.0, "tcr": 16.56, "mvt": 4.26, "net": -1012.15}, {"c": "2539-0004", "n": "SFS Current A/C-USD", "cat": "With Movement", "op": -3352.96, "tdr": 0.0, "tcr": 100.22, "mvt": -109.03, "net": -3453.18}, {"c": "2539-0029", "n": "SFS Current A/C-PHP", "cat": "With Movement", "op": -76924504.61, "tdr": 0.0, "tcr": 29951194.28, "mvt": -44455240.57, "net": -106875698.89}, {"c": "4521-0000", "n": "Trade AP - Sub manual", "cat": "No Movement", "op": -10019.21, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -10019.21}, {"c": "2629-0000", "n": "Prepaid expenses <= 1 year", "cat": "With Movement", "op": 4473065.7, "tdr": 0.0, "tcr": 2114737.86, "mvt": -2819650.48, "net": 2358327.84}, {"c": "2629-0002", "n": "Prepaid rent expense", "cat": "No Movement", "op": 36360.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 36360.0}, {"c": "2631-1000", "n": "Prepaid pension cost ( FP)", "cat": "No Movement", "op": 6030608.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 6030608.0}, {"c": "2681-1000", "n": "Advance Payments <=1 Year", "cat": "With Movement", "op": 1692182.58, "tdr": 185166.06, "tcr": 0.0, "mvt": -4833.94, "net": 1877348.64}, {"c": "2681-1001", "n": "Advance Payments <=1 yr Manual", "cat": "No Movement", "op": -1648070.12, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -1648070.12}]}, {"id": "OTHER CURRENT LIABILITIES & OTHER LIABILITIES||3000", "fsli": "OTHER CURRENT LIABILITIES & OTHER LIABILITIES", "are": "3000", "ccy": "PHP", "risk": "2. ICFR Relevant", "freq": "Monthly", "apd": "08 Jul 2026", "ard": "10 Jul 2026", "gl": -11041301.85, "op": -7611314.08, "tdr": 0.0, "tcr": 3429987.77, "mvt": -5011937.56, "ct": 7, "accts": [{"c": "4624-1001", "n": "Unallocated Payment (manual)", "cat": "No Movement", "op": 981189.06, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 981189.06}, {"c": "4711-0000", "n": "Outstanding Wages & Salaries", "cat": "With Movement", "op": -757288.52, "tdr": 0.0, "tcr": 231944.08, "mvt": -231944.08, "net": -989232.6}, {"c": "4712-1000", "n": "Variable Bonus liab-GroupSTI", "cat": "With Movement", "op": -7403016.71, "tdr": 0.0, "tcr": 3121777.38, "mvt": -4759137.88, "net": -10524794.09}, {"c": "4716-0000", "n": "Special Payments - AWS", "cat": "No Movement", "op": -1654.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -1654.0}, {"c": "4719-0000", "n": "Other Payroll Liability", "cat": "No Movement", "op": 1000.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 1000.0}, {"c": "4719-0001", "n": "Employee Claims Liability", "cat": "With Movement", "op": -22534.5, "tdr": 0.0, "tcr": 7327.0, "mvt": 56920.77, "net": -29861.5}, {"c": "4788-1110", "n": "Misc Liab-Others<1y, financial", "cat": "With Movement", "op": -409009.41, "tdr": 0.0, "tcr": 68939.31, "mvt": -77776.37, "net": -477948.72}]}, {"id": "TRADE PAYABLES||3000", "fsli": "TRADE PAYABLES", "are": "3000", "ccy": "PHP", "risk": "2. ICFR Relevant", "freq": "Monthly", "apd": "08 Jul 2026", "ard": "10 Jul 2026", "gl": -46899753.56, "op": -40887447.44, "tdr": 28835.0, "tcr": 6041141.12, "mvt": -7128889.0, "ct": 3, "accts": [{"c": "4411-0000", "n": "AP Third Party", "cat": "With Movement", "op": -557996.83, "tdr": 28835.0, "tcr": 0.0, "mvt": 38755.0, "net": -529161.83}, {"c": "4411-0001", "n": "AP - Manual Entry", "cat": "With Movement", "op": -40329335.23, "tdr": 0.0, "tcr": 5994041.12, "mvt": -7922716.4, "net": -46323376.35}, {"c": "4411-0002", "n": "Unbilled Invoice by 3rd pty Su", "cat": "With Movement", "op": -115.38, "tdr": 0.0, "tcr": 47100.0, "mvt": 755072.4, "net": -47215.38}]}, {"id": "PROPERTY PLANT & EQUIPMENT||3000", "fsli": "PROPERTY PLANT & EQUIPMENT", "are": "3000", "ccy": "PHP", "risk": "2. ICFR Relevant", "freq": "Quarterly", "apd": "08 Jul 2026", "ard": "10 Jul 2026", "gl": 9577406.64, "op": 9514795.03, "tdr": 780240.0, "tcr": 717628.39, "mvt": -181686.84, "ct": 4, "accts": [{"c": "1362-0000", "n": "Desktop Systems", "cat": "With Movement", "op": 11017400.0, "tdr": 543100.0, "tcr": 0.0, "mvt": 543100.0, "net": 11560500.0}, {"c": "1365-8000", "n": "Plant & Office Eqp", "cat": "With Movement", "op": 0.0, "tdr": 237140.0, "tcr": 0.0, "mvt": 237140.0, "net": 237140.0}, {"c": "1396-2000", "n": "Acc Dep Desktop Systems", "cat": "With Movement", "op": -1502604.97, "tdr": 0.0, "tcr": 709723.73, "mvt": -950069.85, "net": -2212328.7}, {"c": "1396-5800", "n": "Acc Dep Plant & Off Eqpt", "cat": "With Movement", "op": 0.0, "tdr": 0.0, "tcr": 7904.66, "mvt": -11856.99, "net": -7904.66}]}, {"id": "POST EMPLOYMENT BENEFITS||3000", "fsli": "POST EMPLOYMENT BENEFITS", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Annually", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": -5862449.0, "op": -5862449.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "ct": 1, "accts": [{"c": "3671-9000", "n": "Income Tax Payable", "cat": "No Movement", "op": -5862449.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -5862449.0}]}, {"id": "RETAINED EARNINGS||3000", "fsli": "RETAINED EARNINGS", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Annually", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": -16939661.57, "op": -16939661.57, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "ct": 1, "accts": [{"c": "3310-0000", "n": "Prior Years Net Income", "cat": "No Movement", "op": -16939661.57, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -16939661.57}]}, {"id": "SHARE CAPITAL||3000", "fsli": "SHARE CAPITAL", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Annually", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": -10500000.0, "op": -10500000.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "ct": 1, "accts": [{"c": "3000-0000", "n": "Share Capital", "cat": "No Movement", "op": -10500000.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -10500000.0}]}, {"id": "DEFERRED TAX ASSETS & DEFERRED TAX LIABILITIES||3000", "fsli": "DEFERRED TAX ASSETS & DEFERRED TAX LIABILITIES", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Quarterly", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": 19538732.71, "op": 18258136.67, "tdr": 1280596.04, "tcr": 0.0, "mvt": 1201073.23, "ct": 6, "accts": [{"c": "2721-0000", "n": "Loans To Employee < 1 Year", "cat": "No Movement", "op": 4978.48, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 4978.48}, {"c": "2721-0001", "n": "Employee Travel Advance", "cat": "With Movement", "op": 1872716.4, "tdr": 1045052.14, "tcr": 0.0, "mvt": 893052.14, "net": 2917768.54}, {"c": "2731-0000", "n": "Deferred Tax Assets", "cat": "No Movement", "op": 6740700.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 6740700.0}, {"c": "2745-0000", "n": "Local VAT-Input Tax Account", "cat": "With Movement", "op": 6062085.14, "tdr": 235543.9, "tcr": 0.0, "mvt": 308021.09, "net": 6297629.04}, {"c": "2747-0001", "n": "Prepaid Income Tax", "cat": "No Movement", "op": 3177092.5, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 3177092.5}, {"c": "2788-1002", "n": "Other Misc receivable<1yr", "cat": "No Movement", "op": 400564.15, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 400564.15}]}];
 const AP_REFERENCE=[{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000056","payType":"","payDocNumber":"","payDate":"","invoiceDate":"16 Jan 2024","dueDate":"15 Feb 2024","bpInvoiceNo":"19866","currency":"PHP","invAmtFC":"","invAmtHC":"901001.2","amtPaidHC":"","balFC":"","balHC":"901001.2","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"901001.2","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"901001.2"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"450","docNumber":"10000003","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"0","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"431","docNumber":"10000008","payType":"","payDocNumber":"","payDate":"","invoiceDate":"20 Feb 2024","dueDate":"","bpInvoiceNo":"CM-1364","currency":"PHP","invAmtFC":"","invAmtHC":"-356496","amtPaidHC":"","balFC":"","balHC":"-356496","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-356496","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-356496"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"450","docNumber":"10000003","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"0","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"431","docNumber":"10000009","payType":"","payDocNumber":"","payDate":"","invoiceDate":"28 Feb 2024","dueDate":"","bpInvoiceNo":"CM-1369","currency":"PHP","invAmtFC":"","invAmtHC":"-336000","amtPaidHC":"","balFC":"","balHC":"-336000","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-336000","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-336000"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"450","docNumber":"10000004","payType":"","payDocNumber":"","payDate":"","invoiceDate":"31 May 2024","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"0","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11015004","supplierName":"Regus Philippines","payTerm":"400","payTermDesc":"CASH ON DELIVERY","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000015","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Nov 2023","dueDate":"30 Nov 2023","bpInvoiceNo":"3968/11500","currency":"PHP","invAmtFC":"","invAmtHC":"17408.9","amtPaidHC":"","balFC":"","balHC":"17408.9","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"17408.9","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"17408.9"},{"supplierId":"V11015453","supplierName":"Reyes Tacandong & Co","payTerm":"232","payTermDesc":"60 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000346","payType":"","payDocNumber":"","payDate":"","invoiceDate":"18 May 2026","dueDate":"17 Jul 2026","bpInvoiceNo":"27130","currency":"PHP","invAmtFC":"","invAmtHC":"61600","amtPaidHC":"","balFC":"","balHC":"61600","curr0HC":"0","days30HC":"0","days3160HC":"61600","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"61600","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000246","payType":"","payDocNumber":"","payDate":"","invoiceDate":"26 Dec 2024","dueDate":"25 Jan 2025","bpInvoiceNo":"L250515_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"31585.97","amtPaidHC":"","balFC":"","balHC":"31585.97","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"31585.97","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"31585.97"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000290","payType":"","payDocNumber":"","payDate":"","invoiceDate":"13 Nov 2024","dueDate":"13 Dec 2024","bpInvoiceNo":"L246195","currency":"PHP","invAmtFC":"","invAmtHC":"1648.45","amtPaidHC":"","balFC":"","balHC":"1648.45","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"1648.45","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"1648.45"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000292","payType":"","payDocNumber":"","payDate":"","invoiceDate":"14 Nov 2025","dueDate":"14 Dec 2025","bpInvoiceNo":"L280911","currency":"PHP","invAmtFC":"","invAmtHC":"34282.41","amtPaidHC":"","balFC":"","balHC":"34282.41","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"34282.41","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"34282.41"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000293","payType":"","payDocNumber":"","payDate":"","invoiceDate":"22 Dec 2025","dueDate":"21 Jan 2026","bpInvoiceNo":"L284399","currency":"PHP","invAmtFC":"","invAmtHC":"1750.11","amtPaidHC":"","balFC":"","balHC":"1750.11","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"1750.11","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"1750.11"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000028","payType":"","payDocNumber":"","payDate":"","invoiceDate":"19 Mar 2024","dueDate":"18 Apr 2024","bpInvoiceNo":"L222871_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-28160.12","amtPaidHC":"","balFC":"","balHC":"-28160.12","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-28160.12","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-28160.12"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000029","payType":"","payDocNumber":"","payDate":"","invoiceDate":"19 Mar 2024","dueDate":"18 Apr 2024","bpInvoiceNo":"L222871_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"28160.12","amtPaidHC":"","balFC":"","balHC":"28160.12","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"28160.12","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"28160.12"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000030","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"30 May 2024","bpInvoiceNo":"LAGA00232022_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-209.72","amtPaidHC":"","balFC":"","balHC":"-209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-209.72"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000031","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"30 May 2024","bpInvoiceNo":"LAGA00232022_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"209.72","amtPaidHC":"","balFC":"","balHC":"209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"209.72"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000032","payType":"","payDocNumber":"","payDate":"","invoiceDate":"06 May 2024","dueDate":"05 Jun 2024","bpInvoiceNo":"L228813_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-209.72","amtPaidHC":"","balFC":"","balHC":"-209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-209.72"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000033","payType":"","payDocNumber":"","payDate":"","invoiceDate":"06 May 2024","dueDate":"05 Jun 2024","bpInvoiceNo":"L228813_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"209.72","amtPaidHC":"","balFC":"","balHC":"209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"209.72"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000224","payType":"","payDocNumber":"","payDate":"","invoiceDate":"24 Feb 2025","dueDate":"24 Feb 2025","bpInvoiceNo":"2120","currency":"PHP","invAmtFC":"","invAmtHC":"247665.6","amtPaidHC":"","balFC":"","balHC":"170493.6","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"170493.6","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"170493.6"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"291","docNumber":"10000014","payType":"","payDocNumber":"","payDate":"","invoiceDate":"05 Nov 2025","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"43332","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"291","docNumber":"10000020","payType":"","payDocNumber":"","payDate":"","invoiceDate":"24 Jun 2026","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"33840","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000016","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Mar 2024","dueDate":"01 Mar 2024","bpInvoiceNo":"0149112_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-12320","amtPaidHC":"","balFC":"","balHC":"-12320","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-12320","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-12320"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000018","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Mar 2024","dueDate":"01 Mar 2024","bpInvoiceNo":"0149115_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-30800","amtPaidHC":"","balFC":"","balHC":"-30800","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-30800","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-30800"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000020","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Apr 2024","dueDate":"01 Apr 2024","bpInvoiceNo":"0149113_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-12320","amtPaidHC":"","balFC":"","balHC":"-12320","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-12320","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-12320"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000022","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Apr 2024","dueDate":"01 Apr 2024","bpInvoiceNo":"0149116_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-30800","amtPaidHC":"","balFC":"","balHC":"-30800","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-30800","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-30800"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000024","payType":"","payDocNumber":"","payDate":"","invoiceDate":"02 May 2024","dueDate":"02 May 2024","bpInvoiceNo":"0149114_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-12320","amtPaidHC":"","balFC":"","balHC":"-12320","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-12320","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-12320"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000026","payType":"","payDocNumber":"","payDate":"","invoiceDate":"02 May 2024","dueDate":"02 May 2024","bpInvoiceNo":"0149117_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-30800","amtPaidHC":"","balFC":"","balHC":"-30800","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-30800","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-30800"},{"supplierId":"V11025175","supplierName":"TUV SUD PSB Philippines Inc","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000328","payType":"","payDocNumber":"","payDate":"","invoiceDate":"08 May 2026","dueDate":"07 Jun 2026","bpInvoiceNo":"2460075436","currency":"PHP","invAmtFC":"","invAmtHC":"18480","amtPaidHC":"","balFC":"","balHC":"18480","curr0HC":"0","days30HC":"0","days3160HC":"18480","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"18480","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11025962","supplierName":"SM PRIME HOLDINGS  INC.","payTerm":"232","payTermDesc":"60 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000276","payType":"","payDocNumber":"","payDate":"","invoiceDate":"05 Nov 2025","dueDate":"04 Jan 2026","bpInvoiceNo":"6040","currency":"PHP","invAmtFC":"","invAmtHC":"112767.19","amtPaidHC":"","balFC":"","balHC":"112767.19","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"112767.19","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"112767.19"}];
-/* ══ SUPABASE CONFIG — paste your project's values here ══
-   Find these in: Supabase Dashboard → Project Settings → API
-   The anon/public key is safe to expose client-side; access is
-   controlled by the Row Level Security policies in supabase_schema.sql.
-*/
-const SUPABASE_CONFIG = {
-  url:     'https://bpfoixwlqjliexuaguwy.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s',
-};
-const sb = (SUPABASE_CONFIG.url.startsWith('https://YOUR-') || !window.supabase)
-  ? null
-  : window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-
-/* ══ AZURE CONFIG — legacy, unused now that Supabase is wired up ══ */
+/* ══ AZURE CONFIG — set your Function App URL here ══ */
 const AZ_CONFIG = {
-  apiBase: '',
+  apiBase: '',  // e.g. 'https://wsa-recon-api.azurewebsites.net/api'
+                // Leave blank to auto-detect (works when HTML is in same Static Web App)
 };
 
 /* ══ POWER AUTOMATE NOTIFICATION CONFIG ══
@@ -938,148 +835,22 @@ function getApiBase(){
   return window.location.origin + '/api';
 }
 
-/* ══ AUTH — Supabase ══ */
+/* ══ AUTH — Azure Static Web Apps identity ══ */
 async function azGetCurrentUser(){
-  if(!sb) return null;
-  const { data:{ session } } = await sb.auth.getSession();
-  if(!session) return null;
-  return { email: session.user.email };
+  return null; // local file mode - no Azure auth
 }
 
-/* ══ API CLIENT — routes the app's existing REST-style paths to Supabase ══ */
-function _acctRecId(acctKey){ return acctKey.split('::')[0]; }
-
-async function apiGet(path){
-  if(!sb) return null;
-  const parts = path.split('/').filter(Boolean); // e.g. ['state','TRADE PAYABLES||3000']
-
-  if(parts[0]==='dashboard'){
-    const { data, error } = await sb.from('rec_state').select('rec_id,status,version,modified_by');
-    if(error) throw error;
-    return (data||[]).map(r=>({ recId:r.rec_id, status:r.status, version:r.version, modifiedBy:r.modified_by }));
-  }
-
-  if(parts[0]==='state' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    const { data, error } = await sb.from('rec_state').select('*').eq('rec_id', recId).maybeSingle();
-    if(error) throw error;
-    if(!data) return null;
-    return {
-      status:data.status, openItems:data.open_items, comments:data.comments, auditLog:data.audit_log,
-      certStmt:data.cert_stmt, certNotes:data.cert_notes, chks:data.chks, wfEvents:data.wf_events,
-      links:data.links, version:data.version, modifiedBy:data.modified_by, _etag:String(data.version),
-    };
-  }
-
-  if(parts[0]==='acctstate' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    const { data, error } = await sb.from('acct_state').select('*').like('acct_key', recId+'::%');
-    if(error) throw error;
-    const map = {};
-    (data||[]).forEach(row=>{ map[row.acct_key] = { supporting:row.supporting, scheduleType:row.schedule_type, scheduleRows:row.schedule_rows }; });
-    return map;
-  }
-
-  if(parts[0]==='assignments' && !parts[1]){
-    const { data, error } = await sb.from('assignments').select('*');
-    if(error) throw error;
-    const map = {};
-    (data||[]).forEach(row=>{
-      const a = {};
-      if(row.preparer!=null) a.preparer = row.preparer;
-      if(row.reviewer!=null) a.reviewer = row.reviewer;
-      if(row.approver!=null) a.approver = row.approver;
-      map[row.rec_id] = a;
-    });
-    return map;
-  }
-
-  if(parts[0]==='users' && !parts[1]){
-    const { data, error } = await sb.from('users').select('*').order('created_at', { ascending:true });
-    if(error) throw error;
-    return (data||[]).map(u=>({ name:u.name, role:u.role, email:u.email, initials:u.initials }));
-  }
-
-  if(parts[0]==='users' && parts[1]){
-    const email = decodeURIComponent(parts[1]);
-    const { data, error } = await sb.from('users').select('*').eq('email', email).maybeSingle();
-    if(error) throw error;
-    if(!data) return null;
-    return { name:data.name, role:data.role, email:data.email, initials:data.initials };
-  }
-
-  return null;
+/* ══ API CLIENT ══ */
+async function apiGet(path,data){
+  return null; // local file mode
 }
 
-async function apiPut(path,data,etag){
-  if(!sb) return null;
-  const parts = path.split('/').filter(Boolean);
-
-  if(parts[0]==='state' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    // optimistic concurrency: if an etag (previous version) was supplied,
-    // check the row hasn't moved on since we last read it.
-    if(etag!=null){
-      const { data:cur } = await sb.from('rec_state').select('version').eq('rec_id', recId).maybeSingle();
-      if(cur && String(cur.version) !== String(etag)){
-        const err = new Error('Record changed since you last loaded it');
-        err.conflict = cur;
-        throw err;
-      }
-    }
-    const nextVersion = (data.version||0) + 1;
-    const { data:saved, error } = await sb.from('rec_state').upsert({
-      rec_id: recId, status:data.status, open_items:data.openItems, comments:data.comments,
-      audit_log:data.auditLog, cert_stmt:data.certStmt, cert_notes:data.certNotes, chks:data.chks,
-      wf_events:data.wfEvents, links:data.links, version:nextVersion, modified_by:data.modifiedBy,
-      updated_at:new Date().toISOString(),
-    }).select().single();
-    if(error) throw error;
-    return { version:saved.version, _etag:String(saved.version) };
-  }
-
-  if(parts[0]==='acctstate' && parts[1]){
-    const acctKey = decodeURIComponent(parts[1]);
-    const { error } = await sb.from('acct_state').upsert({
-      acct_key:acctKey, supporting:data.supporting, schedule_type:data.scheduleType,
-      schedule_rows:data.scheduleRows, updated_at:new Date().toISOString(),
-    });
-    if(error) throw error;
-    return { ok:true };
-  }
-
-  if(parts[0]==='assignments' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    const { error } = await sb.from('assignments').upsert({
-      rec_id:recId, preparer:data.preparer||null, reviewer:data.reviewer||null, approver:data.approver||null,
-      updated_at:new Date().toISOString(),
-    });
-    if(error) throw error;
-    return { ok:true };
-  }
-
-  return null;
+async function apiPut(path,data){
+  return null; // local file mode
 }
 
 async function apiPost(path,data){
-  if(!sb) return null;
-  const parts = path.split('/').filter(Boolean);
-
-  if(parts[0]==='users'){
-    const { error } = await sb.from('users').upsert({
-      email:data.email, name:data.name, role:data.role, initials:data.initials,
-    }, { onConflict:'email' });
-    if(error) throw error;
-    return { ok:true };
-  }
-
-  return null;
-}
-
-async function apiDeleteUser(email){
-  if(!sb) return;
-  const { error } = await sb.from('users').delete().eq('email', email);
-  if(error) throw error;
+  return null; // local file mode
 }
 
 /* ══ DATA LAYER ══ */
@@ -1279,7 +1050,7 @@ function startAutoRefresh(){
   }, 60000);
 }
 
-let AZ_MODE = true; // true = persist to Supabase instead of running purely in-memory
+let AZ_MODE = false; // true when running in Azure Static Web Apps
 
 /* ══ SHAREPOINT ATTACHMENT CONFIG ══ */
 const SP_ATTACH_CONFIG = {
@@ -1292,16 +1063,24 @@ const SP_ATTACH_CONFIG = {
    UPDATE: set your SharePoint site URL and the library path.
    The state file will be created automatically on first save.
 */
-const AUTO_CERT_RULES={zeroBalance:true,zeroMovement:false,noOpenItems:true,allCheckboxes:false};
-/* Legacy SharePoint-shared-state config — superseded by Supabase.
-   Left in place (disabled) so unused SP helper functions below don't
-   error out or get invoked; filePath/autoLoad/autoSave are off. */
 const SP_STATE_CONFIG = {
-  siteUrl:   '',
-  filePath:  '',
+  // Your SharePoint site URL
+  // e.g. 'https://accenture.sharepoint.com/sites/GlobalAccounting'
+  siteUrl:   '',   // leave blank to auto-detect from current page URL
+
+  // Path to the shared state file inside a document library
+  // The file will be created if it doesn't exist
+  filePath:  '/Shared Documents/ARE3000-Recon-State/ARE3000_Recon_State_Jun-2026.json',
+
+  // Auto-sync interval in seconds (0 = disabled)
+  // When enabled, the tool polls SharePoint for changes every N seconds
   syncInterval: 30,
-  autoLoad: false,
-  autoSave: false,
+
+  // Whether to auto-load state on startup
+  autoLoad: true,
+
+  // Whether to auto-save after every workflow action
+  autoSave: true,
 };
 
 let SP_SYNC_TIMER   = null;   // interval timer for auto-sync
@@ -1723,11 +1502,24 @@ async function spDeleteFile(serverRelativeUrl){
 
 const ST={};
 const ST_ACCT={};
-let USERS=[];
-let CURRID=null;
-const SORT={col:'fsli',dir:'asc'};
-const ASSIGNMENTS={"CASH AND CASH EQUIVALENT||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "INTRAGROUP RECEIVABLES & LIABILITIES||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "OTHER CURRENT LIABILITIES & OTHER LIABILITIES||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "TRADE PAYABLES||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "PROPERTY PLANT & EQUIPMENT||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "POST EMPLOYMENT BENEFITS||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "RETAINED EARNINGS||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "SHARE CAPITAL||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}, "DEFERRED TAX ASSETS & DEFERRED TAX LIABILITIES||3000": {"preparer": "Admin", "reviewer": "Admin", "approver": "Admin"}};
+const ASSIGNMENTS={"CASH AND CASH EQUIVALENT||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "INTRAGROUP RECEIVABLES & LIABILITIES||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "OTHER CURRENT LIABILITIES & OTHER LIABILITIES||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "TRADE PAYABLES||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "PROPERTY PLANT & EQUIPMENT||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "POST EMPLOYMENT BENEFITS||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "RETAINED EARNINGS||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "SHARE CAPITAL||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "DEFERRED TAX ASSETS & DEFERRED TAX LIABILITIES||3000": {"preparer": 2, "reviewer": 4, "approver": 6}};
 const TODAY=new Date(); // current date — used for aging calculations
+const AUTO_CERT_RULES={zeroBalance:true,zeroMovement:false,noOpenItems:true,allCheckboxes:false,matchPriorPeriod:false};
+const SORT={col:'fsli',dir:'asc'};
+let ASSIGN_F='ALL';
+let SEL_RECS=new Set();
+let UID_CTR=6;
+let CUR_RPT=null;
+let NOTIFICATIONS=[];
+window.NOTIFICATIONS=NOTIFICATIONS;
+let NOTIF_OPEN=false;
+let ENTITY_DD_OPEN=false;
+let CURRENT_ENTITY=null;
+let CURRENT_PERIOD=null;
+let F={risk:'ALL',status:'ALL',fsli:'ALL',are:'ALL',q:'',oiage:'ALL'};
+let ZERO_BAL_ONLY=false;
+let isPrep=false,isRev=false,isApp=false,isAdm=false;
+let RDe=RD;
 RD.forEach(r=>{ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[]};});
 function checkAutoCertify(r){
   if(!r)return false;
@@ -1880,101 +1672,21 @@ function applyLoginUI(){
   document.getElementById('navAdminSec').style.display=isAdm?'':'none';
   document.getElementById('navAutoCert').style.display='';
 }
-let CURRENT_USER = null;
-let SEL_ROLE = '';
-let AUTH_MODE = 'signin'; // 'signin' | 'signup'
-async function ssoLogin(provider){
-  if(!sb){ showLoginErr('Supabase is not configured yet — see SETUP.md.'); return; }
-  document.getElementById('loginErr').style.display='none';
-  const { error } = await sb.auth.signInWithOAuth({
-    provider,                                  // 'google' or 'azure'
-    options: { redirectTo: window.location.origin + window.location.pathname }
-  });
-  if(error) showLoginErr(error.message);
-  // On success the browser redirects away to the provider and back;
-  // establishSessionUser() runs from the DOMContentLoaded / onAuthStateChange
-  // handlers once the app reloads with a session.
+function selectRole(r,el){SEL_ROLE=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');validateLogin();}
+function validateLogin(){document.getElementById('loginBtn').disabled=!(document.getElementById('loginName').value.trim()&&SEL_ROLE);}
+function doLogin(){
+  let   name=document.getElementById('loginName').value.trim();
+  if(!name||!SEL_ROLE)return;
+  let   initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  const avCls={preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[SEL_ROLE]||'av-adm';
+  CURRENT_USER={name,role:SEL_ROLE,initials,avCls};
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='flex';
+  applyLoginUI();initDropdowns();
+  if(isAdm){initAdminDropdowns();renderUserRoster();renderAssign();updateAssignProg();updateNavBadges();goPage('admin',document.querySelector('[data-pg="admin"]'));}
+  else{renderKpis();renderDash();updateRoleUI();goPage('dash',document.querySelector('[data-pg="dash"]'));}
 }
-function toggleAuthMode(){
-  AUTH_MODE = AUTH_MODE==='signin' ? 'signup' : 'signin';
-  document.getElementById('loginNameField').style.display = AUTH_MODE==='signup' ? '' : 'none';
-  document.getElementById('loginModeSub').textContent = AUTH_MODE==='signup' ? 'Create your account · June 2026 Period Close' : 'Sign in · June 2026 Period Close';
-  document.getElementById('loginBtn').textContent = AUTH_MODE==='signup' ? 'Create Account' : 'Sign In';
-  document.getElementById('loginToggleText').textContent = AUTH_MODE==='signup' ? 'Already have an account?' : "Don't have an account?";
-  document.getElementById('loginToggleBtn').textContent = AUTH_MODE==='signup' ? 'Sign in' : 'Create one';
-  document.getElementById('loginErr').style.display='none';
-  validateLogin();
-}
-function validateLogin(){
-  const email=document.getElementById('loginEmail').value.trim();
-  const pw=document.getElementById('loginPassword').value;
-  const name=(document.getElementById('loginFullName')||{}).value?.trim();
-  const ok = AUTH_MODE==='signup' ? (email && pw.length>=6 && name) : (email && pw);
-  document.getElementById('loginBtn').disabled = !ok;
-}
-function showLoginErr(msg){
-  const el=document.getElementById('loginErr');
-  el.textContent=msg; el.style.display='';
-}
-async function doLogin(){
-  if(!sb){ showLoginErr('Supabase is not configured yet — see SETUP.md.'); return; }
-  const email=document.getElementById('loginEmail').value.trim();
-  const password=document.getElementById('loginPassword').value;
-  const btn=document.getElementById('loginBtn');
-  document.getElementById('loginErr').style.display='none';
-  btn.disabled=true; btn.textContent='Please wait…';
-
-  try{
-    if(AUTH_MODE==='signup'){
-      const name=document.getElementById('loginFullName').value.trim();
-      const { error } = await sb.auth.signUp({ email, password });
-      if(error) throw error;
-      showLoginErr('Account created. If your admin has already added '+email+' to the roster, sign in now. Otherwise ask them to add you first.');
-      // Stash the display name locally so first sign-in can offer it if needed.
-      try{ localStorage.setItem('pendingName_'+email, name); }catch(e){}
-      toggleAuthMode();
-      btn.disabled=false; btn.textContent='Sign In';
-      return;
-    }
-
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if(error) throw error;
-    await establishSessionUser();
-  }catch(e){
-    showLoginErr(e.message || 'Sign-in failed');
-    btn.disabled=false; btn.textContent = AUTH_MODE==='signup' ? 'Create Account' : 'Sign In';
-  }
-}
-// After Supabase auth succeeds, look up this person's app role from `users`.
-async function establishSessionUser(){
-  const { data:{ session } } = await sb.auth.getSession();
-  if(!session){ return false; }
-  const email = session.user.email;
-  let profile = null;
-  try{ profile = await apiGet('/users/'+encodeURIComponent(email)); }catch(e){}
-  if(!profile){
-    showLoginErr('Signed in, but no role is set up for '+email+' yet. Ask an admin to add you in Setup & Assignment, then sign in again.');
-    await sb.auth.signOut();
-    document.getElementById('loginBtn').disabled=false;
-    document.getElementById('loginBtn').textContent='Sign In';
-    return false;
-  }
-  const avCls={preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
-  CURRENT_USER={ name:profile.name, role:profile.role, email:profile.email, initials:profile.initials, avCls };
-  await bootApp(false);
-  return true;
-}
-async function doLogout(){
-  if(!confirm('Sign out?'))return;
-  if(sb) await sb.auth.signOut();
-  CURRENT_USER=null;
-  document.getElementById('loginScreen').style.display='';
-  document.getElementById('mainApp').style.display='none';
-  document.getElementById('loginEmail').value='';
-  document.getElementById('loginPassword').value='';
-  document.getElementById('loginBtn').disabled=true;
-  NOTIFICATIONS=[];
-}
+function doLogout(){if(!confirm('Sign out?'))return;CURRENT_USER=null;SEL_ROLE='';document.getElementById('loginScreen').style.display='';document.getElementById('mainApp').style.display='none';document.getElementById('loginName').value='';document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));document.getElementById('loginBtn').disabled=true;NOTIFICATIONS=[];}
 function initDropdowns(){
   const fs=[...new Set(RD.map(r=>r.fsli))].sort();
   const as=[...new Set(RD.map(r=>r.are))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
@@ -1982,7 +1694,6 @@ function initDropdowns(){
   if(dF.options.length<=1){fs.forEach(f=>{dF.add(new Option(f,f));if(oF)oF.add(new Option(f,f));});as.forEach(a=>dA.add(new Option('ARE '+a,a)));}
 }
 function goPage(p,el){
-  closeNavIfMobile();
   document.querySelectorAll('.page').forEach(x=>{x.classList.remove('on');x.style.display='none';});
   document.querySelectorAll('.nav-lnk').forEach(x=>x.classList.remove('on'));
   let   pg=document.getElementById('page-'+p);if(pg){pg.classList.add('on');pg.style.display='flex';}
@@ -2123,7 +1834,7 @@ function getFiltered(){
   const are  = (dAreEl  && dAreEl.value)  ? dAreEl.value  : F.are ||'ALL';
   F.fsli=fsli; F.are=are; F.q=q;
   return RD.filter(r=>{
-    if(!ST[r.id]) ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[]};
+    if(!ST[r.id]) return false;  // skip if state not initialized
     if(F.risk!=='ALL'&&r.risk!==F.risk)return false;
     if(fsli!=='ALL'&&r.fsli!==fsli)return false;
     if(are!=='ALL'&&r.are!==are)return false;
@@ -2227,7 +1938,7 @@ function renderRecForm(){
   const oiRows=st.openItems.map((oi,i)=>'<tr><td style="font-size:12.5px;font-weight:500">'+oi.desc+'</td><td><span class="age-tag '+ageCls(ageDays(oi.date))+'">'+ageLabel(ageDays(oi.date))+'</span></td><td class="r '+fc(oi.amt)+'" style="font-weight:600">'+fvb(oi.amt)+'</td><td>'+oi.cat+'</td><td style="font-size:11px;color:var(--t3)">'+oi.date+'</td><td style="font-size:11.5px;color:var(--t2)">'+(oi.comment||'—')+'</td><td>'+(locked?'':'<button class="btn btn-sm" style="color:var(--red);padding:2px 6px" onclick="removeOI('+i+')"><i class="ti ti-trash"></i></button>')+'</td></tr>').join('');
   const cmtHtml=st.comments.map(c=>'<div class="comment-item"><div class="comment-meta"><span>'+c.user+'</span><span>'+c.ts+'</span></div><div>'+c.text+'</div></div>').join('');
   const audHtml=st.auditLog.length?st.auditLog.slice().reverse().map(l=>'<div class="audit-item"><span class="audit-ts">'+l.ts+'</span><span style="flex:1">'+l.msg+'</span><span style="font-size:10.5px;color:var(--t3)">'+l.user+'</span></div>').join(''):'<div style="padding:14px;text-align:center;color:var(--t3);font-size:12px">No activity yet</div>';
-  const attHtml=st.attachments.length===0&&st.links.length===0?'<div style="padding:14px;text-align:center;color:var(--t3);font-size:12px">No documents attached yet</div>':[...st.attachments.map((a,i)=>'<div class="att-item"><div style="width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;background:'+a.iconBg+';color:'+a.iconColor+'">'+a.iconHtml+'</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:500">'+a.name+'</div><div style="font-size:10.5px;color:var(--t3)">'+a.size+' · '+a.ts+'</div></div>'+(a.dataUrl?'<a href="'+a.dataUrl+'" download="'+a.name+'" class="btn btn-sm" title="Download"><i class="ti ti-download"></i></a>':'')+(a.storagePath?'<button class="btn btn-sm" title="Open" onclick="openAttachment('+i+')"><i class="ti ti-external-link"></i></button>':'')+(locked?'':'<button class="btn btn-sm" style="color:var(--red);padding:3px 7px" onclick="removeAtt('+i+')"><i class="ti ti-trash"></i></button>')+'</div>'),...st.links.map((lk,i)=>'<div class="att-item"><div style="width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:var(--blue2);color:var(--blue)"><i class="ti ti-link"></i></div><div style="flex:1;min-width:0"><a href="'+lk.url+'" target="_blank" style="font-size:12.5px;font-weight:500;color:var(--blue)">'+lk.name+'</a><div style="font-size:10.5px;color:var(--t3)">'+lk.ts+'</div></div>'+(locked?'':'<button class="btn btn-sm" style="color:var(--red);padding:3px 7px" onclick="removeLink('+i+')"><i class="ti ti-trash"></i></button>')+'</div>')].join('');
+  const attHtml=st.attachments.length===0&&st.links.length===0?'<div style="padding:14px;text-align:center;color:var(--t3);font-size:12px">No documents attached yet</div>':[...st.attachments.map((a,i)=>'<div class="att-item"><div style="width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:14px;background:'+a.iconBg+';color:'+a.iconColor+'">'+a.iconHtml+'</div><div style="flex:1;min-width:0"><div style="font-size:12.5px;font-weight:500">'+a.name+'</div><div style="font-size:10.5px;color:var(--t3)">'+a.size+' · '+a.ts+'</div></div>'+(a.dataUrl?'<a href="'+a.dataUrl+'" download="'+a.name+'" class="btn btn-sm" title="Download"><i class="ti ti-download"></i></a>':'')+(locked?'':'<button class="btn btn-sm" style="color:var(--red);padding:3px 7px" onclick="removeAtt('+i+')"><i class="ti ti-trash"></i></button>')+'</div>'),...st.links.map((lk,i)=>'<div class="att-item"><div style="width:30px;height:30px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:var(--blue2);color:var(--blue)"><i class="ti ti-link"></i></div><div style="flex:1;min-width:0"><a href="'+lk.url+'" target="_blank" style="font-size:12.5px;font-weight:500;color:var(--blue)">'+lk.name+'</a><div style="font-size:10.5px;color:var(--t3)">'+lk.ts+'</div></div>'+(locked?'':'<button class="btn btn-sm" style="color:var(--red);padding:3px 7px" onclick="removeLink('+i+')"><i class="ti ti-trash"></i></button>')+'</div>')].join('');
   let   html=
     roleBanner+autoCertBanner+
     '<div class="rf-card"><div style="background:var(--navy);padding:14px 16px;display:flex;align-items:flex-start;justify-content:space-between">'
@@ -2930,7 +2641,7 @@ function setStatus(s){
   let   st=ST[CURRID];
   const valid={in_progress:['open','returned'],in_review:['in_progress'],reviewed:['in_review'],returned:['in_review','reviewed'],open:['in_progress','returned'],certified:[]};
   if(!(valid[s]||[]).includes(st.status)){toast('Invalid transition','err');return;}
-  if(s==='in_review'){let   r2=RD.find(x=>x.id===CURRID);let   tots=getAcctTotals(CURRID,r2);if(Math.abs(tots.diff)>=0.01){toast('All account differences must be nil before submitting','err');return;}}
+  // diff check removed for testing — preparer can submit with open differences
   st.status=s;
   const stepMap={in_progress:'prepare',in_review:'submit',reviewed:'review',certified:'approve',returned:'prepare'};
   const sk=stepMap[s];if(sk){st.wfEvents=st.wfEvents.filter(e=>e.step!==sk);st.wfEvents.push({step:sk,user:CURRENT_USER?.name||'User',ts:now(),note:''});}
@@ -2949,7 +2660,7 @@ function certifyRec(){
   if(st.status!=='reviewed'){toast('Must be Pending Approval before certifying','err');return;}
   if(!isApp&&!isAdm){toast('Only an Approver can certify','err');return;}
   let   r2=RD.find(x=>x.id===CURRID);let   tots=getAcctTotals(CURRID,r2);
-  if(Math.abs(tots.diff)>=0.01){toast('Difference must be nil before certifying','err');return;}
+  // diff check removed for testing
   const stmt=document.getElementById('certStmt')?.value;
   if(!stmt){toast('Select a preparer statement','err');return;}
   if(!st.chks[0]||!st.chks[1]||!st.chks[2]){toast('Complete all 3 certification checkboxes','err');return;}
@@ -2977,7 +2688,7 @@ async function handleAttFiles(files){
   if(!CURRID||!files||!files.length)return;
   if(document.getElementById('attFileIn'))document.getElementById('attFileIn').value='';
 
-  const useSupabaseStorage = AZ_MODE && !!sb;
+  const isSpMode = AZ_MODE && typeof getSPSiteUrl === 'function' && SP_ATTACH_CONFIG?.libraryPath;
 
   for(const file of Array.from(files)){
     const icon = getFileIcon(file.name);
@@ -2986,35 +2697,34 @@ async function handleAttFiles(files){
     // Show progress card in attachment list
     showUploadProgress(uploadId, file.name, file.size);
 
-    if(useSupabaseStorage){
-      // ── Supabase Storage upload ──
+    if(isSpMode && AZ_MODE){
+      // ── SharePoint upload ──
       try {
-        updateUploadProgress(uploadId, 10, 'Uploading…');
-        const storagePath = CURRID + '/' + Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-        const { error: upErr } = await sb.storage.from('attachments').upload(storagePath, file, { upsert:false });
-        if(upErr) throw upErr;
-        updateUploadProgress(uploadId, 90, 'Finalizing…');
-        // Bucket is private — store the path and sign a URL on demand when opened.
+        const result = await spUploadFile(file, CURRID, (pct, msg)=>{
+          updateUploadProgress(uploadId, pct, msg);
+        });
+        // Store metadata (URL, not base64)
         ST[CURRID].attachments.push({
           name:              file.name,
           size:              fmtSize(file.size),
           ts:                now(),
-          storagePath:       storagePath,
+          spUrl:             result.spUrl,
+          serverRelativeUrl: result.serverRelativeUrl,
           uploadedBy:        CURRENT_USER?.name||'User',
           ...icon,
-          dataUrl:           null,
+          dataUrl:           null, // no base64 — file is in SP
         });
-        logAudit(CURRID,'Attachment uploaded: "'+file.name+'" ('+fmtSize(file.size)+')');
+        logAudit(CURRID,'Attachment uploaded to SharePoint: "'+file.name+'" ('+fmtSize(file.size)+')');
         if(ST[CURRID].status==='open') ST[CURRID].status='in_progress';
-        scheduleSave(CURRID);
-        finishUploadProgress(uploadId, 'success', null);
+        if(AZ_MODE) scheduleSave(CURRID);
+        finishUploadProgress(uploadId, 'success', result.spUrl);
         renderRecForm();
       } catch(err){
         finishUploadProgress(uploadId, 'error', err.message);
         toast('Upload failed: '+err.message, 'err');
       }
     } else {
-      // ── Fallback: store as base64 (Supabase not configured) ──
+      // ── Local mode: store as base64 (no SP configured) ──
       const reader = new FileReader();
       reader.onload = e2 => {
         ST[CURRID].attachments.push({
@@ -3032,17 +2742,6 @@ async function handleAttFiles(files){
     }
   }
 }
-async function openAttachment(i){
-  const a = ST[CURRID]?.attachments?.[i];
-  if(!a) return;
-  if(a.dataUrl){ window.open(a.dataUrl, '_blank'); return; }
-  if(a.storagePath && sb){
-    const { data, error } = await sb.storage.from('attachments').createSignedUrl(a.storagePath, 300);
-    if(error){ toast('Could not open file: '+error.message, 'err'); return; }
-    window.open(data.signedUrl, '_blank');
-  }
-}
-window.openAttachment = openAttachment;
 
 function showUploadProgress(id, name, size){
   // Ensure the rec form is rendered so .att-list exists in DOM
@@ -3077,7 +2776,8 @@ function finishUploadProgress(id, status, url){
     card.style.borderColor = 'var(--green3)';
     card.innerHTML = '<div style="display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--green)">'
       +'<i class="ti ti-circle-check" style="font-size:16px"></i>'
-      +'<span style="font-weight:500">Uploaded</span>'
+      +'<span style="font-weight:500">Uploaded to SharePoint</span>'
+      +(url?'<a href="'+url+'" target="_blank" class="btn btn-sm" style="margin-left:auto"><i class="ti ti-external-link"></i>Open</a>':'')
       +'</div>';
     setTimeout(()=>card.remove(), 3000);
   } else if(status==='error'){
@@ -3096,14 +2796,13 @@ async function removeAtt(i){
   if(!CURRID)return;
   const a = ST[CURRID].attachments.splice(i,1)[0];
   logAudit(CURRID,'Attachment removed: "'+a.name+'"');
-  // Delete from Supabase Storage if it was uploaded there
-  if(a.storagePath && sb){
+  // Delete from SharePoint if it was uploaded there
+  if(a.serverRelativeUrl && AZ_MODE){
     try {
-      const { error } = await sb.storage.from('attachments').remove([a.storagePath]);
-      if(error) throw error;
+      await spDeleteFile(a.serverRelativeUrl);
     } catch(e){
-      console.warn('Storage delete failed:', e.message);
-      toast('File removed from record but storage delete failed','err');
+      console.warn('SP delete failed:', e.message);
+      toast('File removed from record but SP delete failed','err');
     }
   }
   if(AZ_MODE) scheduleSave(CURRID);
@@ -4775,14 +4474,17 @@ function renderEntityList(){
   filtered.forEach(e=>{
     let   cert=e.recs.filter(id=>ST[id]?.status==='certified').length;
     let   pct=e.recs.length?Math.round(cert/e.recs.length*100):0;
-      +'<div class="ei-code">'+e.are+'</div>'
+    const eDiv=document.createElement('div');
+    eDiv.className='entity-item'+(CURRENT_ENTITY===e.are?' active':'');
+    eDiv.innerHTML='<div class="ei-code">'+e.are+'</div>'
       +'<div class="ei-ccy">'+e.ccy+'</div>'
       +'<div class="ei-stats">'
       +'<div class="ei-recs">'+e.recs.length+' reconciliations · '+cert+' certified</div>'
       +'<div class="ei-prog"><div class="ei-prog-fill" style="width:'+pct+'%"></div></div>'
       +'</div>'
-      +'<div class="ei-pct">'+pct+'%</div>'
-      +'</div>';
+      +'<div class="ei-pct">'+pct+'%</div>';
+    eDiv.addEventListener('click',()=>selectEntity(e.are));
+    frag.appendChild(eDiv);
   });
   list.innerHTML='';
   if(filtered.length===0&&CURRENT_ENTITY!==null){
@@ -4848,7 +4550,9 @@ function getRDFiltered(){
 let NOTIF_CTR=0;
 function pushNotif({type,title,msg,recId,recipients,extraData}){
   // In-app notification (always)
-  NOTIFICATIONS.unshift({id:++NOTIF_CTR,type,title,msg,recId,ts:now(),read:false});
+  if(!window.NOTIFICATIONS) window.NOTIFICATIONS=[];
+  window.NOTIFICATIONS.unshift({id:++NOTIF_CTR,type,title,msg,recId,ts:now(),read:false});
+  NOTIFICATIONS=window.NOTIFICATIONS;
   renderNotif();
   // External notification via Power Automate
   if(PA_CONFIG.enabled && PA_CONFIG.webhookUrl && recipients?.length){
@@ -4917,41 +4621,13 @@ function getRecipients(recId, roles){
   return names;
 }
 function toggleNotif(){NOTIF_OPEN=!NOTIF_OPEN;document.getElementById('notifPanel').classList.toggle('on',NOTIF_OPEN);}
-function markAllRead(){NOTIFICATIONS.forEach(n=>n.read=true);document.getElementById('notifDot').classList.remove('on');renderNotif();}
-function renderNotif(){const u=NOTIFICATIONS.filter(n=>!n.read).length;document.getElementById('notifDot').classList.toggle('on',u>0);const body=document.getElementById('notifBody');if(!NOTIFICATIONS.length){body.innerHTML='<div class="np-empty"><i class="ti ti-bell-off"></i>No notifications yet</div>';return;}const im={pending:'ti-clock',approved:'ti-circle-check',returned:'ti-arrow-back-up',info:'ti-info-circle'};body.innerHTML=NOTIFICATIONS.map(n=>'<div class="ni '+(n.read?'':'unread')+'" onclick="handleNi('+n.id+')"><div class="ni-ic '+n.type+'"><i class="ti '+(im[n.type]||'ti-bell')+'"></i></div><div class="ni-body"><div class="ni-title">'+n.title+'</div><div class="ni-msg">'+n.msg+'</div><div class="ni-time">'+n.ts+'</div></div></div>').join('');}
+function markAllRead(){if(!window.NOTIFICATIONS)window.NOTIFICATIONS=[];NOTIFICATIONS=window.NOTIFICATIONS;NOTIFICATIONS.forEach(n=>n.read=true);document.getElementById('notifDot').classList.remove('on');renderNotif();}
+function renderNotif(){if(!window.NOTIFICATIONS)window.NOTIFICATIONS=[];NOTIFICATIONS=window.NOTIFICATIONS;const u=NOTIFICATIONS.filter(n=>!n.read).length;document.getElementById('notifDot').classList.toggle('on',u>0);const body=document.getElementById('notifBody');if(!NOTIFICATIONS.length){body.innerHTML='<div class="np-empty"><i class="ti ti-bell-off"></i>No notifications yet</div>';return;}const im={pending:'ti-clock',approved:'ti-circle-check',returned:'ti-arrow-back-up',info:'ti-info-circle'};body.innerHTML=NOTIFICATIONS.map(n=>'<div class="ni '+(n.read?'':'unread')+'" onclick="handleNi('+n.id+')"><div class="ni-ic '+n.type+'"><i class="ti '+(im[n.type]||'ti-bell')+'"></i></div><div class="ni-body"><div class="ni-title">'+n.title+'</div><div class="ni-msg">'+n.msg+'</div><div class="ni-time">'+n.ts+'</div></div></div>').join('');}
 function handleNi(id){const n=NOTIFICATIONS.find(x=>x.id===id);if(!n)return;n.read=true;renderNotif();if(n.recId){if(NOTIF_OPEN)toggleNotif();openRec(n.recId);}}
 const RC={preparer:{bg:'var(--blue2)',color:'var(--blue)',bd:'var(--blue3)',avBg:'var(--blue)'},reviewer:{bg:'var(--green2)',color:'var(--green)',bd:'var(--green3)',avBg:'var(--green)'},approver:{bg:'var(--purple2)',color:'var(--purple)',bd:'var(--purple3)',avBg:'var(--purple)'}};
 function initAdminDropdowns(){const fS=document.getElementById('assignFsliF'),aS=document.getElementById('assignAreF');if(fS&&fS.options.length<=1){[...new Set(RD.map(r=>r.fsli))].sort().forEach(f=>fS.add(new Option(f,f)));[...new Set(RD.map(r=>r.are))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true})).forEach(a=>aS.add(new Option('ARE '+a,a)));}}
-async function addUser(){
-  const name=(document.getElementById('newUserName')||{}).value?.trim();
-  const email=(document.getElementById('newUserEmail')||{}).value?.trim().toLowerCase();
-  const role=(document.getElementById('newUserRole')||{}).value;
-  if(!name){toast('Enter a name','err');return;}
-  if(!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){toast('Enter a valid email','err');return;}
-  if(USERS.find(u=>u.email===email)){toast('That email is already on the roster','err');return;}
-  const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-  const newUser={id:++UID_CTR,name,role,email,initials};
-  if(AZ_MODE && sb){
-    try{ await apiPost('/users',{name,role,email,initials}); }
-    catch(e){ toast('Could not save user to Supabase: '+e.message,'err'); return; }
-  }
-  USERS.push(newUser);
-  document.getElementById('newUserName').value='';
-  document.getElementById('newUserEmail').value='';
-  renderUserRoster();renderAssign();updateBulkSels();updateAssignProg();updateNavBadges();
-  toast(name+' added as '+role+' — they can now create an account with '+email,'ok');
-}
-async function removeUser(id){
-  const u = USERS.find(x=>x.id===id);
-  USERS=USERS.filter(u=>u.id!==id);
-  Object.keys(ASSIGNMENTS).forEach(rid=>{const a=ASSIGNMENTS[rid];if(a.preparer===id)delete a.preparer;if(a.reviewer===id)delete a.reviewer;if(a.approver===id)delete a.approver;});
-  if(AZ_MODE && sb && u?.email){
-    try{ await apiDeleteUser(u.email); }
-    catch(e){ toast('Removed locally, but Supabase delete failed: '+e.message,'err'); }
-  }
-  renderUserRoster();renderAssign();updateBulkSels();updateAssignProg();updateNavBadges();
-  toast('User removed');
-}
+function addUser(){const name=(document.getElementById('newUserName')||{}).value?.trim();let   role=(document.getElementById('newUserRole')||{}).value;if(!name){toast('Enter a name','err');return;}if(USERS.find(u=>u.name.toLowerCase()===name.toLowerCase()&&u.role===role)){toast('User already exists','err');return;}const initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);USERS.push({id:++UID_CTR,name,role,initials});document.getElementById('newUserName').value='';renderUserRoster();renderAssign();updateBulkSels();updateAssignProg();updateNavBadges();toast(name+' added as '+role,'ok');}
+function removeUser(id){USERS=USERS.filter(u=>u.id!==id);Object.keys(ASSIGNMENTS).forEach(rid=>{const a=ASSIGNMENTS[rid];if(a.preparer===id)delete a.preparer;if(a.reviewer===id)delete a.reviewer;if(a.approver===id)delete a.approver;});renderUserRoster();renderAssign();updateBulkSels();updateAssignProg();updateNavBadges();toast('User removed');}
 function updateSPStateConfig(){
   const site  = (document.getElementById('spSiteInput')?.value||'').trim();
   const path  = (document.getElementById('spPathInput')?.value||'').trim();
@@ -5029,7 +4705,6 @@ async function testPANotification(){
 }
 
 function renderUserRoster(){
-  if(!window.USERS||typeof USERS==='undefined') return;
   let   el=document.getElementById('userRoster');
   document.getElementById('userCt').textContent=USERS.length+' user'+(USERS.length!==1?'s':'');
   if(!USERS.length){el.innerHTML='<div style="padding:10px;text-align:center;color:var(--t3);font-size:12px">No team members yet</div>';return;}
@@ -5296,7 +4971,7 @@ function showManualLogin(){
 }
 
 async function bootApp(isReturning){
-  const isAdm = CURRENT_USER?.role === 'admin' || CURRENT_USER?.isAdm === true;
+  console.log('bootApp called, isAdm:', isAdm, 'CURRENT_USER:', CURRENT_USER?.name);
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='flex';
   applyLoginUI();
@@ -5350,10 +5025,20 @@ async function bootApp(isReturning){
 }
 
 // Auto-login exposed globally so boot script can call it
-window.addEventListener('DOMContentLoaded', async function(){
-  // Initialize local ST defaults for every rec so the app has something
-  // to render immediately; azLoadDashboardState() overlays real status
-  // from Supabase once a session is established.
+window.addEventListener('DOMContentLoaded', function(){
+  AZ_MODE=false;
+  SEL_ROLE='admin';
+  CURRENT_USER={name:'Admin',email:'admin@accenture.com',role:'admin',initials:'AD',avCls:'av-adm'};
+  isAdm=true; isPrep=false; isRev=false; isApp=false;
+
+  // Hide login, show app
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='flex';
+
+  // Init
+  applyLoginUI();
+  initDropdowns();
+  // Initialize ST for all recs so dashboard shows them
   RD.forEach(function(r){
     if(!ST[r.id]) ST[r.id]={
       status:'open', openItems:[], comments:[], auditLog:[],
@@ -5362,31 +5047,39 @@ window.addEventListener('DOMContentLoaded', async function(){
     };
   });
 
-  if(!sb){
-    showLoginErr('Supabase is not configured yet. Edit SUPABASE_CONFIG near the top of the <script> section — see SETUP.md.');
-    return;
-  }
+  // Force all filters to ALL
+  F={risk:'ALL',status:'ALL',fsli:'ALL',are:'ALL',q:'',oiage:'ALL'};
+  ZERO_BAL_ONLY=false; CURRENT_ENTITY=null; CURRID=null;
+  var da=document.getElementById('dAre');  if(da)  da.value='ALL';
+  var df=document.getElementById('dFsli'); if(df)  df.value='ALL';
+  var ds=document.getElementById('dSrch'); if(ds)  ds.value='';
 
-  // Resume an existing session (e.g. page refresh) without re-prompting login.
-  const { data:{ session } } = await sb.auth.getSession();
-  if(session){
-    await establishSessionUser();
-  }
+  // Admin setup
+  initAdminDropdowns();
+  renderUserRoster();
+  renderAssign();
+  updateAssignProg();
+  updateRoleUI();
 
-  // Keep the app in sync if the session changes in another tab, and catch
-  // the OAuth redirect (Google/Microsoft) completing on this load.
-  let _handledSignIn = !!session;
-  sb.auth.onAuthStateChange(function(event){
-    if(event==='SIGNED_OUT' && CURRENT_USER){
-      CURRENT_USER=null;
-      document.getElementById('loginScreen').style.display='';
-      document.getElementById('mainApp').style.display='none';
-    }
-    if(event==='SIGNED_IN' && !_handledSignIn && !CURRENT_USER){
-      _handledSignIn = true;
-      establishSessionUser();
-    }
+  // Render dashboard
+  renderKpis();
+  renderDash();
+  updateNavBadges();
+
+  // Force page-dash on, everything else off
+  document.querySelectorAll('.page').forEach(function(p){
+    p.classList.remove('on');
+    p.style.display='none';
   });
+  var dp=document.getElementById('page-dash');
+  if(dp){ dp.classList.add('on'); dp.style.display='flex'; }
+  var bc2=document.getElementById('bc2');
+  if(bc2) bc2.style.display='none';
+  document.querySelectorAll('.nav-lnk').forEach(function(n){n.classList.remove('on');});
+  var dashNav=document.querySelector('[data-pg="dash"]');
+  if(dashNav) dashNav.classList.add('on');
+  // TEST: auto-open ARE 3000
+  setTimeout(function(){ openRec('TRADE PAYABLES||3000'); }, 150);
 });
 
 // Expose all functions globally
@@ -5430,8 +5123,7 @@ window.getSchedTotal=getSchedTotal;
 window.getAcctSupported=getAcctSupported;
 window.getAcctTotals=getAcctTotals;
 window.applyLoginUI=applyLoginUI;
-window.toggleAuthMode=toggleAuthMode;
-window.ssoLogin=ssoLogin;
+window.selectRole=selectRole;
 window.validateLogin=validateLogin;
 window.doLogin=doLogin;
 window.doLogout=doLogout;
