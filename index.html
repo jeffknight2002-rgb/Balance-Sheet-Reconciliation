@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -809,6 +810,8 @@ button{cursor:pointer}
 
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 <script>
+if(typeof getSb==='undefined'){window.getSb=function(){return window._sb||null;}}
+
 
 
 
@@ -5409,6 +5412,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 </script>
