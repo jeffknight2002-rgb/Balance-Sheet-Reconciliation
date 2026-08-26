@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -450,15 +451,11 @@ button{cursor:pointer}
     <div class="login-logo">Account Reconciliation</div>
     <div class="login-title">ARE 3000 · Jun 2026</div>
     <div class="login-sub">June 2026 · Period Close</div>
-    <label class="login-lbl">Your Name</label>
-    <input class="login-inp" id="loginName" placeholder="Enter your full name" oninput="validateLogin()"/>
-    <label class="login-lbl" style="margin-bottom:8px">Select Your Role</label>
-    <div class="role-grid">
-      <div class="role-card" onclick="selectRole('preparer',this)"><div class="rc-icon"><i class="ti ti-pencil"></i></div><div class="rc-name">Preparer</div><div class="rc-desc">Prepare and submit reconciliations</div></div>
-      <div class="role-card" onclick="selectRole('reviewer',this)"><div class="rc-icon"><i class="ti ti-eye"></i></div><div class="rc-name">Reviewer</div><div class="rc-desc">First-level review and sign-off</div></div>
-      <div class="role-card" onclick="selectRole('approver',this)"><div class="rc-icon"><i class="ti ti-shield-check"></i></div><div class="rc-name">Approver</div><div class="rc-desc">Final approval and period lock</div></div>
-      <div class="role-card" onclick="selectRole('admin',this)"><div class="rc-icon"><i class="ti ti-settings-2"></i></div><div class="rc-name">Admin / Manager</div><div class="rc-desc">Setup users and assignments</div></div>
-    </div>
+    <div id="loginErr" style="display:none;font-size:12px;color:var(--red);background:var(--red2);border:1px solid var(--red3);border-radius:var(--r);padding:8px 10px;margin-bottom:12px"></div>
+    <label class="login-lbl">Email</label>
+    <input class="login-inp" id="loginEmail" type="email" placeholder="you@gmail.com" oninput="validateLogin()"/>
+    <label class="login-lbl">Password</label>
+    <input class="login-inp" id="loginPassword" type="password" placeholder="••••••••" oninput="validateLogin()" onkeyup="if(event.key==='Enter'&&!document.getElementById('loginBtn').disabled)doLogin()"/>
     <button class="login-btn" id="loginBtn" onclick="doLogin()" disabled>Sign In</button>
     <div style="text-align:center;font-size:11px;color:var(--t3);margin-top:12px">Period: June 2026 · Due: 21 Jul 2026</div>
   </div>
@@ -807,6 +804,8 @@ button{cursor:pointer}
 
 
 
+
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -1013,14 +1012,28 @@ async function azGetUserRole(email){
 
 async function azLoadDashboardState(){
   try {
-    let   items = await apiGet('/dashboard');
-    items.forEach(item => {
-      if(ST[item.recId]){
-        ST[item.recId].status     = item.status || 'open';
-        ST[item.recId].version    = item.version || 0;
-        ST[item.recId].modifiedBy = item.modifiedBy || '';
+    // Load full state for ALL recs from rec_state table
+    const sbClient = getSb();
+    if(!sbClient) return;
+    const { data, error } = await sbClient.from('rec_state').select('*');
+    if(error) throw error;
+    (data||[]).forEach(row => {
+      const id = row.rec_id;
+      if(ST[id]){
+        ST[id].status     = row.status     || 'open';
+        ST[id].openItems  = row.open_items || [];
+        ST[id].comments   = row.comments   || [];
+        ST[id].auditLog   = row.audit_log  || [];
+        ST[id].certStmt   = row.cert_stmt  || '';
+        ST[id].certNotes  = row.cert_notes || '';
+        ST[id].chks       = row.chks       || [false,false,false];
+        ST[id].wfEvents   = row.wf_events  || [];
+        ST[id].links      = row.links      || [];
+        ST[id].version    = row.version    || 0;
+        ST[id].modifiedBy = row.modified_by|| '';
       }
     });
+    console.log('[azLoadDashboardState] Loaded', (data||[]).length, 'recs from Supabase');
   } catch(e){ console.warn('azLoadDashboardState:', e.message); }
 }
 
@@ -1029,7 +1042,8 @@ async function azLoadRecState(recId){
     const item = await apiGet('/state/' + encodeURIComponent(recId));
     if(item && item._etag) AZ_ETAGS[recId] = item._etag;
     if(item){
-      return {
+      // Merge into ST directly so it persists
+      Object.assign(ST[recId], {
         status:     item.status     || 'open',
         openItems:  item.openItems  || [],
         comments:   item.comments   || [],
@@ -1042,7 +1056,8 @@ async function azLoadRecState(recId){
         attachments:[],
         version:    item.version    || 0,
         modifiedBy: item.modifiedBy || '',
-      };
+      });
+      return ST[recId];
     }
   } catch(e){ console.warn('azLoadRecState:', e.message); }
   return null;
@@ -1811,19 +1826,29 @@ function applyLoginUI(){
 function selectRole(r,el){SEL_ROLE=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');validateLogin();}
 function validateLogin(){document.getElementById('loginBtn').disabled=!(document.getElementById('loginName').value.trim()&&SEL_ROLE);}
 async function doLogin(){
-  const name = (document.getElementById('loginName')||{}).value?.trim();
-  if(!name || !SEL_ROLE) return;
-  const initials = name.split(' ').map(w=>w[0]||'').join('').toUpperCase().slice(0,2)||'??';
-  const avCls = {preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[SEL_ROLE]||'av-adm';
-  const emailMap = {
-    'Jefferson Cafe':'jeffknight2002@gmail.com',
-    'Tester One':'tester1@gmail.com','Tester Two':'tester2@gmail.com',
-    'Tester Three':'tester3@gmail.com','Tester Four':'tester4@gmail.com',
-    'Tester Five':'tester5@gmail.com','Kula Song':'kulasong@test.com'
-  };
-  const email = emailMap[name] || (name.toLowerCase().replace(/\s+/g,'.')+'@test.com');
-  CURRENT_USER = {name, role:SEL_ROLE, initials, avCls, email};
-  await bootApp(false);
+  const email    = (document.getElementById('loginEmail')||{}).value?.trim();
+  const password = (document.getElementById('loginPassword')||{}).value;
+  const btn      = document.getElementById('loginBtn');
+  const errEl    = document.getElementById('loginErr');
+  errEl.style.display = 'none';
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    const sbClient = getSb();
+    if(!sbClient) throw new Error('Supabase not initialized');
+    // Sign in with Supabase Auth
+    const { error: authErr } = await sbClient.auth.signInWithPassword({ email, password });
+    if(authErr) throw authErr;
+    // Look up role from users table
+    const profile = await apiGet('/users/' + encodeURIComponent(email));
+    if(!profile) throw new Error('No role assigned for ' + email + '. Ask your admin to add you.');
+    const avCls = {preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
+    CURRENT_USER = { name:profile.name, role:profile.role, email:profile.email, initials:profile.initials, avCls };
+    await bootApp(false);
+  } catch(e) {
+    errEl.textContent = e.message || 'Sign-in failed';
+    errEl.style.display = '';
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
 }
 function doLogout(){if(!confirm('Sign out?'))return;CURRENT_USER=null;SEL_ROLE='';document.getElementById('loginScreen').style.display='';document.getElementById('mainApp').style.display='none';document.getElementById('loginName').value='';document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));document.getElementById('loginBtn').disabled=true;NOTIFICATIONS=[];}
 function initDropdowns(){
@@ -5164,21 +5189,27 @@ async function bootApp(isReturning){
 
 // Auto-login exposed globally so boot script can call it
 window.addEventListener('DOMContentLoaded', async function(){
-  // Initialize default ST for all recs
+  // Initialize default ST
   RD.forEach(function(r){
     if(!ST[r.id]) ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[],returnHistory:[]};
   });
-  // Restore session from sessionStorage if available
+  // Check for existing Supabase session
   try {
-    const saved = sessionStorage.getItem('currentUser');
-    if(saved){
-      CURRENT_USER = JSON.parse(saved);
-      SEL_ROLE = CURRENT_USER.role;
-      await bootApp(true);
-      return;
+    const sbClient = getSb();
+    if(sbClient){
+      const { data:{ session } } = await sbClient.auth.getSession();
+      if(session){
+        const profile = await apiGet('/users/' + encodeURIComponent(session.user.email));
+        if(profile){
+          const avCls = {preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
+          CURRENT_USER = { name:profile.name, role:profile.role, email:profile.email, initials:profile.initials, avCls };
+          await bootApp(true);
+          return;
+        }
+      }
     }
-  } catch(e){}
-  // No session — show login screen
+  } catch(e){ console.warn('Session restore failed:', e.message); }
+  // No session — show login
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainApp').style.display='none';
 });
@@ -5381,8 +5412,22 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
+
+
+
+
+
+
+
+
+
+
 </script>
+
 <script>
 </script>
+
 </body>
 </html>
