@@ -806,6 +806,8 @@ button{cursor:pointer}
 
 
 
+
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -884,9 +886,17 @@ async function apiGet(path){
   }
   if(parts[0]==='users' && parts[1]){
     const email = decodeURIComponent(parts[1]);
+    console.log('[apiGet] Looking up user:', email);
     const { data, error } = await sbClient.from('users').select('*').eq('email', email).maybeSingle();
+    console.log('[apiGet] users result:', data, 'error:', error);
     if(error) throw error;
-    if(!data) return null;
+    if(!data){
+      // Try case-insensitive fallback
+      const { data: data2, error: err2 } = await sbClient.from('users').select('*').ilike('email', email).maybeSingle();
+      console.log('[apiGet] ilike fallback:', data2, err2);
+      if(data2) return { name:data2.name, role:data2.role, email:data2.email, initials:data2.initials };
+      return null;
+    }
     return { name:data.name, role:data.role, email:data.email, initials:data.initials };
   }
   return null;
@@ -1843,11 +1853,20 @@ async function doLogin(){
     // Sign in with Supabase Auth
     const { error: authErr } = await sbClient.auth.signInWithPassword({ email, password });
     if(authErr) throw authErr;
-    // Look up role from users table
-    const profile = await apiGet('/users/' + encodeURIComponent(email));
-    if(!profile) throw new Error('No role assigned for ' + email + '. Ask your admin to add you.');
+    // Look up role from hardcoded map
+    const USER_MAP = {
+  'jeffknight2002@gmail.com': {name:'Jefferson Cafe', role:'admin',    initials:'JC'},
+  'kulasong@test.com':        {name:'Kula Song',      role:'preparer', initials:'KS'},
+  'tester1@gmail.com':        {name:'Tester One',     role:'preparer', initials:'T1'},
+  'tester2@gmail.com':        {name:'Tester Two',     role:'preparer', initials:'T2'},
+  'tester3@gmail.com':        {name:'Tester Three',   role:'reviewer', initials:'T3'},
+  'tester4@gmail.com':        {name:'Tester Four',    role:'reviewer', initials:'T4'},
+  'tester5@gmail.com':        {name:'Tester Five',    role:'approver', initials:'T5'},
+};
+    const profile = USER_MAP[email.toLowerCase()];
+    if(!profile) throw new Error('No role assigned for ' + email + '. Contact your admin.');
     const avCls = {preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
-    CURRENT_USER = { name:profile.name, role:profile.role, email:profile.email, initials:profile.initials, avCls };
+    CURRENT_USER = { name:profile.name, role:profile.role, email:email, initials:profile.initials, avCls };
     await bootApp(false);
   } catch(e) {
     errEl.textContent = e.message || 'Sign-in failed';
@@ -5204,10 +5223,19 @@ window.addEventListener('DOMContentLoaded', async function(){
     if(sbClient){
       const { data:{ session } } = await sbClient.auth.getSession();
       if(session){
-        const profile = await apiGet('/users/' + encodeURIComponent(session.user.email));
+        const USER_MAP = {
+  'jeffknight2002@gmail.com': {name:'Jefferson Cafe', role:'admin',    initials:'JC'},
+  'kulasong@test.com':        {name:'Kula Song',      role:'preparer', initials:'KS'},
+  'tester1@gmail.com':        {name:'Tester One',     role:'preparer', initials:'T1'},
+  'tester2@gmail.com':        {name:'Tester Two',     role:'preparer', initials:'T2'},
+  'tester3@gmail.com':        {name:'Tester Three',   role:'reviewer', initials:'T3'},
+  'tester4@gmail.com':        {name:'Tester Four',    role:'reviewer', initials:'T4'},
+  'tester5@gmail.com':        {name:'Tester Five',    role:'approver', initials:'T5'},
+};
+        const profile = USER_MAP[session.user.email.toLowerCase()];
         if(profile){
           const avCls = {preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
-          CURRENT_USER = { name:profile.name, role:profile.role, email:profile.email, initials:profile.initials, avCls };
+          CURRENT_USER = { name:profile.name, role:profile.role, email:session.user.email, initials:profile.initials, avCls };
           await bootApp(true);
           return;
         }
@@ -5417,6 +5445,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
