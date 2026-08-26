@@ -805,6 +805,7 @@ button{cursor:pointer}
 
 
 
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -1823,7 +1824,12 @@ function applyLoginUI(){
   document.getElementById('navAutoCert').style.display='';
 }
 function selectRole(r,el){SEL_ROLE=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');validateLogin();}
-function validateLogin(){document.getElementById('loginBtn').disabled=!(document.getElementById('loginName').value.trim()&&SEL_ROLE);}
+function validateLogin(){
+  const email = (document.getElementById('loginEmail')||{}).value?.trim();
+  const pw    = (document.getElementById('loginPassword')||{}).value;
+  const btn   = document.getElementById('loginBtn');
+  if(btn) btn.disabled = !(email && pw);
+}
 async function doLogin(){
   const email    = (document.getElementById('loginEmail')||{}).value?.trim();
   const password = (document.getElementById('loginPassword')||{}).value;
@@ -5411,6 +5417,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
