@@ -833,6 +833,8 @@ button{cursor:pointer}
 
 
 
+
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -1060,7 +1062,7 @@ async function azGetUserRole(email){
 
 async function azLoadDashboardState(){
   try {
-    const sbClient = getSb();
+    const sbClient = getSb() || window._sb;
     if(!sbClient){ console.warn('[azLoadDashboardState] No Supabase client'); return; }
     const { data, error } = await sbClient.from('rec_state').select('*');
     if(error){ console.error('[azLoadDashboardState] Error:', error.message); throw error; }
@@ -1089,7 +1091,8 @@ async function azLoadDashboardState(){
 
 async function azLoadRecState(recId){
   try {
-    const item = await apiGet('/state/' + encodeURIComponent(recId));
+    const sbClient2 = getSb() || window._sb;
+    const item = sbClient2 ? await apiGet('/state/' + encodeURIComponent(recId)) : null;
     if(item && item._etag) AZ_ETAGS[recId] = item._etag;
     if(item){
       // Merge into ST directly so it persists
@@ -1116,7 +1119,7 @@ async function azLoadRecState(recId){
 async function azSaveRecState(recId){
   let   st = ST[recId];
   if(!st) return;
-  const sbClient = await getSbAsync();
+  const sbClient = getSb() || window._sb || await getSbAsync();
   if(!sbClient){ console.warn('[azSaveRecState] No Supabase client for', recId); return; }
   try {
     const nextVersion = (st.version||0) + 1;
@@ -1148,28 +1151,30 @@ async function azSaveRecState(recId){
 
 async function azLoadAcctState(recId){
   try {
-    const sbClient = getSb();
+    const sbClient = getSb() || window._sb;
     if(!sbClient) return;
     const { data, error } = await sbClient.from('acct_state')
       .select('*')
       .like('acct_key', recId + '::%');
     if(error) throw error;
-    (data||[]).forEach(row=>{
+    if(!data || !data.length) return;
+    data.forEach(row=>{
+      if(!row || !row.acct_key) return;
       ST_ACCT[row.acct_key] = {
-        supporting:   row.supporting   || [],
+        supporting:   Array.isArray(row.supporting)   ? row.supporting   : [],
         scheduleType: row.schedule_type || 'none',
-        scheduleRows: row.schedule_rows || [],
+        scheduleRows: Array.isArray(row.schedule_rows) ? row.schedule_rows : [],
       };
     });
-    console.log('[azLoadAcctState] Loaded', (data||[]).length, 'accounts for', recId);
-  } catch(e){ console.warn('azLoadAcctState:', e.message); }
+    console.log('[azLoadAcctState] Loaded', data.length, 'accounts for', recId);
+  } catch(e){ console.warn('[azLoadAcctState]', e.message); }
 }
 
 async function azSaveAcctState(acctKey){
   let   ast = ST_ACCT[acctKey];
   if(!ast) return;
   try {
-    const sbClient = getSb();
+    const sbClient = getSb() || window._sb;
     if(!sbClient) return;
     const { error } = await sbClient.from('acct_state').upsert({
       acct_key:      acctKey,
@@ -1185,8 +1190,18 @@ async function azSaveAcctState(acctKey){
 
 async function azLoadAssignments(){
   try {
-    let   map = await apiGet('/assignments');
-    Object.assign(ASSIGNMENTS, map);
+    const sbClient = getSb() || window._sb;
+    if(!sbClient) return;
+    const { data, error } = await sbClient.from('assignments').select('*');
+    if(error) throw error;
+    (data||[]).forEach(row=>{
+      if(!row || !row.rec_id) return;
+      const a = {};
+      if(row.preparer!=null) a.preparer = row.preparer;
+      if(row.reviewer!=null) a.reviewer = row.reviewer;
+      if(row.approver!=null) a.approver = row.approver;
+      ASSIGNMENTS[row.rec_id] = a;
+    });
   } catch(e){ console.warn('azLoadAssignments:', e.message); }
 }
 
@@ -1200,9 +1215,12 @@ async function azSaveAssignment(recId){
 
 async function azLoadUsers(){
   try {
-    let   items = await apiGet('/users');
-    if(items && Array.isArray(items)){
-      USERS = items.map((u,i) => ({ id: i+1, name:u.name, role:u.role, email:u.email, initials:u.initials }));
+    const sbClient = getSb() || window._sb;
+    if(!sbClient) return;
+    const { data, error } = await sbClient.from('users').select('*').order('created_at',{ascending:true});
+    if(error) throw error;
+    if(data && Array.isArray(data)){
+      USERS = data.map((u,i) => ({ id: i+1, name:u.name, role:u.role, email:u.email, initials:u.initials||'' }));
     }
   } catch(e){ console.warn('azLoadUsers:', e.message); }
 }
@@ -5472,6 +5490,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
