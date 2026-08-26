@@ -808,6 +808,7 @@ button{cursor:pointer}
 
 
 
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -1080,31 +1081,27 @@ async function azSaveRecState(recId){
     const saved = await apiPut(
       '/state/' + encodeURIComponent(recId),
       {
-        status:     st.status,
-        openItems:  st.openItems,
-        comments:   st.comments,
-        auditLog:   st.auditLog,
-        certStmt:   st.certStmt,
-        certNotes:  st.certNotes,
-        chks:       st.chks,
-        wfEvents:   st.wfEvents,
-        links:      st.links,
-        version:    st.version || 0,
+        status:     st.status     || 'open',
+        openItems:  st.openItems  || [],
+        comments:   st.comments   || [],
+        auditLog:   st.auditLog   || [],
+        certStmt:   st.certStmt   || '',
+        certNotes:  st.certNotes  || '',
+        chks:       st.chks       || [false,false,false],
+        wfEvents:   st.wfEvents   || [],
+        links:      st.links      || [],
+        version:    st.version    || 0,
         modifiedBy: CURRENT_USER?.name || '',
       },
-      AZ_ETAGS[recId] // send etag for conflict detection
+      AZ_ETAGS[recId]
     );
-    if(saved._etag) AZ_ETAGS[recId] = saved._etag;
-    st.version = saved.version;
+    if(saved && saved._etag) AZ_ETAGS[recId] = saved._etag;
+    if(saved && saved.version) st.version = saved.version;
     setSaveIndicator(recId,'saved');
   } catch(e){
-    if(e.conflict){
-      setSaveIndicator(recId,'error');
-      showConflictDialog(recId, e.conflict);
-    } else {
-      setSaveIndicator(recId,'error');
-      toast('Save failed — ' + e.message, 'err');
-    }
+    console.warn('azSaveRecState error:', e.message);
+    setSaveIndicator(recId,'error');
+    toast('Save failed — ' + e.message, 'err');
   }
 }
 
@@ -5445,6 +5442,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
