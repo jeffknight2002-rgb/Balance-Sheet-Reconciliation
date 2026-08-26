@@ -806,6 +806,7 @@ button{cursor:pointer}
 
 
 
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -5106,6 +5107,8 @@ function showManualLogin(){
 }
 
 async function bootApp(isReturning){
+  // Persist session across soft refreshes
+  try { sessionStorage.setItem('currentUser', JSON.stringify(CURRENT_USER)); } catch(e){}
   console.log('bootApp called, isAdm:', isAdm, 'CURRENT_USER:', CURRENT_USER?.name);
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='flex';
@@ -5160,12 +5163,22 @@ async function bootApp(isReturning){
 }
 
 // Auto-login exposed globally so boot script can call it
-window.addEventListener('DOMContentLoaded', function(){
+window.addEventListener('DOMContentLoaded', async function(){
   // Initialize default ST for all recs
   RD.forEach(function(r){
     if(!ST[r.id]) ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[],returnHistory:[]};
   });
-  // Always show login screen on fresh load
+  // Restore session from sessionStorage if available
+  try {
+    const saved = sessionStorage.getItem('currentUser');
+    if(saved){
+      CURRENT_USER = JSON.parse(saved);
+      SEL_ROLE = CURRENT_USER.role;
+      await bootApp(true);
+      return;
+    }
+  } catch(e){}
+  // No session — show login screen
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainApp').style.display='none';
 });
@@ -5368,19 +5381,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
-
-
-
-
-
-
-
-
-
 </script>
-
 <script>
 </script>
-
 </body>
 </html>
