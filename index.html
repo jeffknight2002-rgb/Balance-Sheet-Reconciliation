@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -810,7 +809,17 @@ button{cursor:pointer}
 
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 <script>
+
+
+let isPrep=false,isRev=false,isApp=false,isAdm=false;
+let CURRENT_USER=null;
+let CURRID=null;
+let SEL_ROLE='';
+let AZ_MODE=true;
+let UID_CTR=6;
+
 if(typeof getSb==='undefined'){window.getSb=function(){return window._sb||null;}}
+let CURRENT_PERIOD=null;
 
 
 
@@ -1061,7 +1070,7 @@ function startAutoRefresh(){
   }, 60000);
 }
 
-let AZ_MODE = true; // true when running in Azure Static Web Apps
+ // true when running in Azure Static Web Apps
 
 /* ══ SHAREPOINT ATTACHMENT CONFIG ══ */
 const SP_ATTACH_CONFIG = {
@@ -5412,6 +5421,9 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
+
 
 
 
