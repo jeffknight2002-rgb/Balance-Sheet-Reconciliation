@@ -8,16 +8,8 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
-// Initialize Supabase immediately after CDN loads (synchronous)
 (function(){
-  var SURL = 'https://bpfoixwlqjliexuaguwy.supabase.co';
-  var SKEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s';
-  if(typeof window.supabase !== 'undefined'){
-    window._sb = window.supabase.createClient(SURL, SKEY);
-    console.log('[Supabase] Initialized synchronously ✓');
-  } else {
-    console.error('[Supabase] CDN not loaded!');
-  }
+  if(typeof window.supabase!=='undefined'){ window._sb=window.supabase.createClient('https://bpfoixwlqjliexuaguwy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s'); console.log('[Supabase] Ready'); }
 })();
 </script>
 <style>
@@ -815,40 +807,6 @@ button{cursor:pointer}
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
-
-
-let CURRENT_USER=null;
-let CURRID=null;
-let SEL_ROLE='';
-let isPrep=false,isRev=false,isApp=false,isAdm=false;
-
-
-
-
-
-
-
 let   RD=[{"id": "CASH AND CASH EQUIVALENT||3000", "fsli": "CASH AND CASH EQUIVALENT", "are": "3000", "ccy": "PHP", "risk": "1. Most Critical", "freq": "Monthly", "apd": "03 Jul 2026", "ard": "04 Jul 2026", "gl": 15318013.22, "op": 16993354.03, "tdr": 0.0, "tcr": 1675340.81, "mvt": 2087752.29, "ct": 2, "accts": [{"c": "2881-0203", "n": "HSBC Bank-PHP A/C", "cat": "With Movement", "op": 16993354.03, "tdr": 0.0, "tcr": 902481.81, "mvt": 3633470.29, "net": 16090872.22}, {"c": "4870-0001", "n": "Purchase Invoice Receipt (Manu", "cat": "With Movement", "op": 0.0, "tdr": 0.0, "tcr": 772859.0, "mvt": -1545718.0, "net": -772859.0}]}, {"id": "INTRAGROUP RECEIVABLES & LIABILITIES||3000", "fsli": "INTRAGROUP RECEIVABLES & LIABILITIES", "are": "3000", "ccy": "PHP", "risk": "1. Most Critical", "freq": "Monthly", "apd": "03 Jul 2026", "ard": "04 Jul 2026", "gl": 24951955.85, "op": 31117439.63, "tdr": 25900565.14, "tcr": 32066048.92, "mvt": -11181315.88, "ct": 10, "accts": [{"c": "2539-0001", "n": "SFS Current A/C-SGD", "cat": "With Movement", "op": 97472165.84, "tdr": 25715399.08, "tcr": 0.0, "mvt": 36098513.88, "net": 123187564.92}, {"c": "2539-0003", "n": "SFS Current A/C-EUR", "cat": "With Movement", "op": -995.59, "tdr": 0.0, "tcr": 16.56, "mvt": 4.26, "net": -1012.15}, {"c": "2539-0004", "n": "SFS Current A/C-USD", "cat": "With Movement", "op": -3352.96, "tdr": 0.0, "tcr": 100.22, "mvt": -109.03, "net": -3453.18}, {"c": "2539-0029", "n": "SFS Current A/C-PHP", "cat": "With Movement", "op": -76924504.61, "tdr": 0.0, "tcr": 29951194.28, "mvt": -44455240.57, "net": -106875698.89}, {"c": "4521-0000", "n": "Trade AP - Sub manual", "cat": "No Movement", "op": -10019.21, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -10019.21}, {"c": "2629-0000", "n": "Prepaid expenses <= 1 year", "cat": "With Movement", "op": 4473065.7, "tdr": 0.0, "tcr": 2114737.86, "mvt": -2819650.48, "net": 2358327.84}, {"c": "2629-0002", "n": "Prepaid rent expense", "cat": "No Movement", "op": 36360.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 36360.0}, {"c": "2631-1000", "n": "Prepaid pension cost ( FP)", "cat": "No Movement", "op": 6030608.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 6030608.0}, {"c": "2681-1000", "n": "Advance Payments <=1 Year", "cat": "With Movement", "op": 1692182.58, "tdr": 185166.06, "tcr": 0.0, "mvt": -4833.94, "net": 1877348.64}, {"c": "2681-1001", "n": "Advance Payments <=1 yr Manual", "cat": "No Movement", "op": -1648070.12, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -1648070.12}]}, {"id": "OTHER CURRENT LIABILITIES & OTHER LIABILITIES||3000", "fsli": "OTHER CURRENT LIABILITIES & OTHER LIABILITIES", "are": "3000", "ccy": "PHP", "risk": "2. ICFR Relevant", "freq": "Monthly", "apd": "08 Jul 2026", "ard": "10 Jul 2026", "gl": -11041301.85, "op": -7611314.08, "tdr": 0.0, "tcr": 3429987.77, "mvt": -5011937.56, "ct": 7, "accts": [{"c": "4624-1001", "n": "Unallocated Payment (manual)", "cat": "No Movement", "op": 981189.06, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 981189.06}, {"c": "4711-0000", "n": "Outstanding Wages & Salaries", "cat": "With Movement", "op": -757288.52, "tdr": 0.0, "tcr": 231944.08, "mvt": -231944.08, "net": -989232.6}, {"c": "4712-1000", "n": "Variable Bonus liab-GroupSTI", "cat": "With Movement", "op": -7403016.71, "tdr": 0.0, "tcr": 3121777.38, "mvt": -4759137.88, "net": -10524794.09}, {"c": "4716-0000", "n": "Special Payments - AWS", "cat": "No Movement", "op": -1654.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -1654.0}, {"c": "4719-0000", "n": "Other Payroll Liability", "cat": "No Movement", "op": 1000.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 1000.0}, {"c": "4719-0001", "n": "Employee Claims Liability", "cat": "With Movement", "op": -22534.5, "tdr": 0.0, "tcr": 7327.0, "mvt": 56920.77, "net": -29861.5}, {"c": "4788-1110", "n": "Misc Liab-Others<1y, financial", "cat": "With Movement", "op": -409009.41, "tdr": 0.0, "tcr": 68939.31, "mvt": -77776.37, "net": -477948.72}]}, {"id": "TRADE PAYABLES||3000", "fsli": "TRADE PAYABLES", "are": "3000", "ccy": "PHP", "risk": "2. ICFR Relevant", "freq": "Monthly", "apd": "08 Jul 2026", "ard": "10 Jul 2026", "gl": -46899753.56, "op": -40887447.44, "tdr": 28835.0, "tcr": 6041141.12, "mvt": -7128889.0, "ct": 3, "accts": [{"c": "4411-0000", "n": "AP Third Party", "cat": "With Movement", "op": -557996.83, "tdr": 28835.0, "tcr": 0.0, "mvt": 38755.0, "net": -529161.83}, {"c": "4411-0001", "n": "AP - Manual Entry", "cat": "With Movement", "op": -40329335.23, "tdr": 0.0, "tcr": 5994041.12, "mvt": -7922716.4, "net": -46323376.35}, {"c": "4411-0002", "n": "Unbilled Invoice by 3rd pty Su", "cat": "With Movement", "op": -115.38, "tdr": 0.0, "tcr": 47100.0, "mvt": 755072.4, "net": -47215.38}]}, {"id": "PROPERTY PLANT & EQUIPMENT||3000", "fsli": "PROPERTY PLANT & EQUIPMENT", "are": "3000", "ccy": "PHP", "risk": "2. ICFR Relevant", "freq": "Quarterly", "apd": "08 Jul 2026", "ard": "10 Jul 2026", "gl": 9577406.64, "op": 9514795.03, "tdr": 780240.0, "tcr": 717628.39, "mvt": -181686.84, "ct": 4, "accts": [{"c": "1362-0000", "n": "Desktop Systems", "cat": "With Movement", "op": 11017400.0, "tdr": 543100.0, "tcr": 0.0, "mvt": 543100.0, "net": 11560500.0}, {"c": "1365-8000", "n": "Plant & Office Eqp", "cat": "With Movement", "op": 0.0, "tdr": 237140.0, "tcr": 0.0, "mvt": 237140.0, "net": 237140.0}, {"c": "1396-2000", "n": "Acc Dep Desktop Systems", "cat": "With Movement", "op": -1502604.97, "tdr": 0.0, "tcr": 709723.73, "mvt": -950069.85, "net": -2212328.7}, {"c": "1396-5800", "n": "Acc Dep Plant & Off Eqpt", "cat": "With Movement", "op": 0.0, "tdr": 0.0, "tcr": 7904.66, "mvt": -11856.99, "net": -7904.66}]}, {"id": "POST EMPLOYMENT BENEFITS||3000", "fsli": "POST EMPLOYMENT BENEFITS", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Annually", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": -5862449.0, "op": -5862449.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "ct": 1, "accts": [{"c": "3671-9000", "n": "Income Tax Payable", "cat": "No Movement", "op": -5862449.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -5862449.0}]}, {"id": "RETAINED EARNINGS||3000", "fsli": "RETAINED EARNINGS", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Annually", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": -16939661.57, "op": -16939661.57, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "ct": 1, "accts": [{"c": "3310-0000", "n": "Prior Years Net Income", "cat": "No Movement", "op": -16939661.57, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -16939661.57}]}, {"id": "SHARE CAPITAL||3000", "fsli": "SHARE CAPITAL", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Annually", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": -10500000.0, "op": -10500000.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "ct": 1, "accts": [{"c": "3000-0000", "n": "Share Capital", "cat": "No Movement", "op": -10500000.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": -10500000.0}]}, {"id": "DEFERRED TAX ASSETS & DEFERRED TAX LIABILITIES||3000", "fsli": "DEFERRED TAX ASSETS & DEFERRED TAX LIABILITIES", "are": "3000", "ccy": "PHP", "risk": "3. Others", "freq": "Quarterly", "apd": "11 Jul 2026", "ard": "13 Jul 2026", "gl": 19538732.71, "op": 18258136.67, "tdr": 1280596.04, "tcr": 0.0, "mvt": 1201073.23, "ct": 6, "accts": [{"c": "2721-0000", "n": "Loans To Employee < 1 Year", "cat": "No Movement", "op": 4978.48, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 4978.48}, {"c": "2721-0001", "n": "Employee Travel Advance", "cat": "With Movement", "op": 1872716.4, "tdr": 1045052.14, "tcr": 0.0, "mvt": 893052.14, "net": 2917768.54}, {"c": "2731-0000", "n": "Deferred Tax Assets", "cat": "No Movement", "op": 6740700.0, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 6740700.0}, {"c": "2745-0000", "n": "Local VAT-Input Tax Account", "cat": "With Movement", "op": 6062085.14, "tdr": 235543.9, "tcr": 0.0, "mvt": 308021.09, "net": 6297629.04}, {"c": "2747-0001", "n": "Prepaid Income Tax", "cat": "No Movement", "op": 3177092.5, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 3177092.5}, {"c": "2788-1002", "n": "Other Misc receivable<1yr", "cat": "No Movement", "op": 400564.15, "tdr": 0.0, "tcr": 0.0, "mvt": 0.0, "net": 400564.15}]}];
 const AP_REFERENCE=[{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000056","payType":"","payDocNumber":"","payDate":"","invoiceDate":"16 Jan 2024","dueDate":"15 Feb 2024","bpInvoiceNo":"19866","currency":"PHP","invAmtFC":"","invAmtHC":"901001.2","amtPaidHC":"","balFC":"","balHC":"901001.2","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"901001.2","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"901001.2"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"450","docNumber":"10000003","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"0","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"431","docNumber":"10000008","payType":"","payDocNumber":"","payDate":"","invoiceDate":"20 Feb 2024","dueDate":"","bpInvoiceNo":"CM-1364","currency":"PHP","invAmtFC":"","invAmtHC":"-356496","amtPaidHC":"","balFC":"","balHC":"-356496","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-356496","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-356496"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"450","docNumber":"10000003","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"0","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"431","docNumber":"10000009","payType":"","payDocNumber":"","payDate":"","invoiceDate":"28 Feb 2024","dueDate":"","bpInvoiceNo":"CM-1369","currency":"PHP","invAmtFC":"","invAmtHC":"-336000","amtPaidHC":"","balFC":"","balHC":"-336000","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-336000","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-336000"},{"supplierId":"V11009293","supplierName":"TMF Philippines  Inc.","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"450","docNumber":"10000004","payType":"","payDocNumber":"","payDate":"","invoiceDate":"31 May 2024","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"0","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11015004","supplierName":"Regus Philippines","payTerm":"400","payTermDesc":"CASH ON DELIVERY","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000015","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Nov 2023","dueDate":"30 Nov 2023","bpInvoiceNo":"3968/11500","currency":"PHP","invAmtFC":"","invAmtHC":"17408.9","amtPaidHC":"","balFC":"","balHC":"17408.9","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"17408.9","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"17408.9"},{"supplierId":"V11015453","supplierName":"Reyes Tacandong & Co","payTerm":"232","payTermDesc":"60 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000346","payType":"","payDocNumber":"","payDate":"","invoiceDate":"18 May 2026","dueDate":"17 Jul 2026","bpInvoiceNo":"27130","currency":"PHP","invAmtFC":"","invAmtHC":"61600","amtPaidHC":"","balFC":"","balHC":"61600","curr0HC":"0","days30HC":"0","days3160HC":"61600","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"61600","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000246","payType":"","payDocNumber":"","payDate":"","invoiceDate":"26 Dec 2024","dueDate":"25 Jan 2025","bpInvoiceNo":"L250515_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"31585.97","amtPaidHC":"","balFC":"","balHC":"31585.97","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"31585.97","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"31585.97"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000290","payType":"","payDocNumber":"","payDate":"","invoiceDate":"13 Nov 2024","dueDate":"13 Dec 2024","bpInvoiceNo":"L246195","currency":"PHP","invAmtFC":"","invAmtHC":"1648.45","amtPaidHC":"","balFC":"","balHC":"1648.45","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"1648.45","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"1648.45"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000292","payType":"","payDocNumber":"","payDate":"","invoiceDate":"14 Nov 2025","dueDate":"14 Dec 2025","bpInvoiceNo":"L280911","currency":"PHP","invAmtFC":"","invAmtHC":"34282.41","amtPaidHC":"","balFC":"","balHC":"34282.41","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"34282.41","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"34282.41"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000293","payType":"","payDocNumber":"","payDate":"","invoiceDate":"22 Dec 2025","dueDate":"21 Jan 2026","bpInvoiceNo":"L284399","currency":"PHP","invAmtFC":"","invAmtHC":"1750.11","amtPaidHC":"","balFC":"","balHC":"1750.11","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"1750.11","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"1750.11"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000028","payType":"","payDocNumber":"","payDate":"","invoiceDate":"19 Mar 2024","dueDate":"18 Apr 2024","bpInvoiceNo":"L222871_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-28160.12","amtPaidHC":"","balFC":"","balHC":"-28160.12","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-28160.12","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-28160.12"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000029","payType":"","payDocNumber":"","payDate":"","invoiceDate":"19 Mar 2024","dueDate":"18 Apr 2024","bpInvoiceNo":"L222871_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"28160.12","amtPaidHC":"","balFC":"","balHC":"28160.12","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"28160.12","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"28160.12"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000030","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"30 May 2024","bpInvoiceNo":"LAGA00232022_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-209.72","amtPaidHC":"","balFC":"","balHC":"-209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-209.72"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000031","payType":"","payDocNumber":"","payDate":"","invoiceDate":"30 Apr 2024","dueDate":"30 May 2024","bpInvoiceNo":"LAGA00232022_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"209.72","amtPaidHC":"","balFC":"","balHC":"209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"209.72"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000032","payType":"","payDocNumber":"","payDate":"","invoiceDate":"06 May 2024","dueDate":"05 Jun 2024","bpInvoiceNo":"L228813_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-209.72","amtPaidHC":"","balFC":"","balHC":"-209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-209.72"},{"supplierId":"V11017086","supplierName":"Starr International Insurance Phili","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000033","payType":"","payDocNumber":"","payDate":"","invoiceDate":"06 May 2024","dueDate":"05 Jun 2024","bpInvoiceNo":"L228813_ADJ","currency":"PHP","invAmtFC":"","invAmtHC":"209.72","amtPaidHC":"","balFC":"","balHC":"209.72","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"209.72","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"209.72"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000224","payType":"","payDocNumber":"","payDate":"","invoiceDate":"24 Feb 2025","dueDate":"24 Feb 2025","bpInvoiceNo":"2120","currency":"PHP","invAmtFC":"","invAmtHC":"247665.6","amtPaidHC":"","balFC":"","balHC":"170493.6","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"170493.6","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"170493.6"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"291","docNumber":"10000014","payType":"","payDocNumber":"","payDate":"","invoiceDate":"05 Nov 2025","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"43332","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"291","docNumber":"10000020","payType":"","payDocNumber":"","payDate":"","invoiceDate":"24 Jun 2026","dueDate":"","bpInvoiceNo":"","currency":"PHP","invAmtFC":"","invAmtHC":"0","amtPaidHC":"33840","balFC":"","balHC":"","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000016","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Mar 2024","dueDate":"01 Mar 2024","bpInvoiceNo":"0149112_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-12320","amtPaidHC":"","balFC":"","balHC":"-12320","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-12320","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-12320"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000018","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Mar 2024","dueDate":"01 Mar 2024","bpInvoiceNo":"0149115_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-30800","amtPaidHC":"","balFC":"","balHC":"-30800","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-30800","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-30800"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000020","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Apr 2024","dueDate":"01 Apr 2024","bpInvoiceNo":"0149113_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-12320","amtPaidHC":"","balFC":"","balHC":"-12320","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-12320","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-12320"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000022","payType":"","payDocNumber":"","payDate":"","invoiceDate":"01 Apr 2024","dueDate":"01 Apr 2024","bpInvoiceNo":"0149116_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-30800","amtPaidHC":"","balFC":"","balHC":"-30800","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-30800","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-30800"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000024","payType":"","payDocNumber":"","payDate":"","invoiceDate":"02 May 2024","dueDate":"02 May 2024","bpInvoiceNo":"0149114_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-12320","amtPaidHC":"","balFC":"","balHC":"-12320","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-12320","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-12320"},{"supplierId":"V11017643","supplierName":"Platon Martinez Flores San Pedro an","payTerm":"701","payTermDesc":"Pyt upon receipt of invoice","finBPGroup":"TRD","country":"PH","docTxnType":"430","docNumber":"10000026","payType":"","payDocNumber":"","payDate":"","invoiceDate":"02 May 2024","dueDate":"02 May 2024","bpInvoiceNo":"0149117_REV","currency":"PHP","invAmtFC":"","invAmtHC":"-30800","amtPaidHC":"","balFC":"","balHC":"-30800","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"-30800","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"-30800"},{"supplierId":"V11025175","supplierName":"TUV SUD PSB Philippines Inc","payTerm":"212","payTermDesc":"30 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000328","payType":"","payDocNumber":"","payDate":"","invoiceDate":"08 May 2026","dueDate":"07 Jun 2026","bpInvoiceNo":"2460075436","currency":"PHP","invAmtFC":"","invAmtHC":"18480","amtPaidHC":"","balFC":"","balHC":"18480","curr0HC":"0","days30HC":"0","days3160HC":"18480","days6190HC":"0","days91180HC":"0","days180plusHC":"0","curr0":"0","days30":"0","days3160":"18480","days6190":"0","days91180":"0","days180plus":"0"},{"supplierId":"V11025962","supplierName":"SM PRIME HOLDINGS  INC.","payTerm":"232","payTermDesc":"60 DAYS CREDIT","finBPGroup":"TRD","country":"PH","docTxnType":"410","docNumber":"10000276","payType":"","payDocNumber":"","payDate":"","invoiceDate":"05 Nov 2025","dueDate":"04 Jan 2026","bpInvoiceNo":"6040","currency":"PHP","invAmtFC":"","invAmtHC":"112767.19","amtPaidHC":"","balFC":"","balHC":"112767.19","curr0HC":"0","days30HC":"0","days3160HC":"0","days6190HC":"0","days91180HC":"0","days180plusHC":"112767.19","curr0":"0","days30":"0","days3160":"0","days6190":"0","days91180":"0","days180plus":"112767.19"}];
 /* ══ AZURE CONFIG — set your Function App URL here ══ */
@@ -856,150 +814,6 @@ const AZ_CONFIG = {
   apiBase: '',  // e.g. 'https://wsa-recon-api.azurewebsites.net/api'
                 // Leave blank to auto-detect (works when HTML is in same Static Web App)
 };
-
-/* ══ SUPABASE CONFIG ══ */
-const SUPABASE_CONFIG = {
-  url:     'https://bpfoixwlqjliexuaguwy.supabase.co',
-  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s',
-};
-let _sb = null;
-function getSb(){
-  // Use pre-initialized client from <head> script
-  if(window._sb) return window._sb;
-  if(_sb) return _sb;
-  if(typeof window.supabase !== 'undefined' && window.supabase.createClient){
-    _sb = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
-    window._sb = _sb;
-    console.log('[Supabase] Client initialized in getSb() ✓');
-  }
-  return _sb || null;
-}
-async function getSbAsync(maxWait=5000){
-  if(getSb()) return getSb();
-  const start = Date.now();
-  while(Date.now()-start < maxWait){
-    await new Promise(r=>setTimeout(r,100));
-    if(getSb()) return getSb();
-  }
-  console.error('[Supabase] Timeout waiting for client');
-  return null;
-}
-
-async function apiGet(path){
-  const sbClient = getSb();
-  if(!sbClient) return null;
-  const parts = path.split('/').filter(Boolean);
-  if(parts[0]==='dashboard'){
-    const { data, error } = await sbClient.from('rec_state').select('rec_id,status,version,modified_by');
-    if(error) throw error;
-    return (data||[]).map(r=>({ recId:r.rec_id, status:r.status, version:r.version, modifiedBy:r.modified_by }));
-  }
-  if(parts[0]==='state' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    const { data, error } = await sbClient.from('rec_state').select('*').eq('rec_id', recId).maybeSingle();
-    if(error) throw error;
-    if(!data) return null;
-    return { status:data.status, openItems:data.open_items||[], comments:data.comments||[], auditLog:data.audit_log||[],
-      certStmt:data.cert_stmt||'', certNotes:data.cert_notes||'', chks:data.chks||[false,false,false],
-      wfEvents:data.wf_events||[], links:data.links||[], version:data.version||0,
-      modifiedBy:data.modified_by||'', _etag:String(data.version||0) };
-  }
-  if(parts[0]==='acctstate' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    const { data, error } = await sbClient.from('acct_state').select('*').like('acct_key', recId+'::%');
-    if(error) throw error;
-    const map = {};
-    (data||[]).forEach(row=>{ map[row.acct_key] = { supporting:row.supporting||[], scheduleType:row.schedule_type||'none', scheduleRows:row.schedule_rows||[] }; });
-    return map;
-  }
-  if(parts[0]==='assignments'){
-    const { data, error } = await sbClient.from('assignments').select('*');
-    if(error) throw error;
-    const map = {};
-    (data||[]).forEach(row=>{ const a={}; if(row.preparer!=null) a.preparer=row.preparer; if(row.reviewer!=null) a.reviewer=row.reviewer; if(row.approver!=null) a.approver=row.approver; map[row.rec_id]=a; });
-    return map;
-  }
-  if(parts[0]==='users' && !parts[1]){
-    const { data, error } = await sbClient.from('users').select('*').order('created_at',{ascending:true});
-    if(error) throw error;
-    return (data||[]).map(u=>({ name:u.name, role:u.role, email:u.email, initials:u.initials }));
-  }
-  if(parts[0]==='users' && parts[1]){
-    const email = decodeURIComponent(parts[1]);
-    console.log('[apiGet] Looking up user:', email);
-    const { data, error } = await sbClient.from('users').select('*').eq('email', email).maybeSingle();
-    console.log('[apiGet] users result:', data, 'error:', error);
-    if(error) throw error;
-    if(!data){
-      // Try case-insensitive fallback
-      const { data: data2, error: err2 } = await sbClient.from('users').select('*').ilike('email', email).maybeSingle();
-      console.log('[apiGet] ilike fallback:', data2, err2);
-      if(data2) return { name:data2.name, role:data2.role, email:data2.email, initials:data2.initials };
-      return null;
-    }
-    return { name:data.name, role:data.role, email:data.email, initials:data.initials };
-  }
-  return null;
-}
-
-async function apiPut(path, data, etag){
-  const sbClient = getSb();
-  console.log('[apiPut] path:', path, 'sb:', !!sbClient);
-  if(!sbClient) { console.warn('[apiPut] No Supabase client'); return null; }
-  const parts = path.split('/').filter(Boolean);
-  if(parts[0]==='state' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    const nextVersion = (data.version||0) + 1;
-    const { data:saved, error } = await sbClient.from('rec_state').upsert({
-      rec_id:recId, status:data.status, open_items:data.openItems||[], comments:data.comments||[],
-      audit_log:data.auditLog||[], cert_stmt:data.certStmt||'', cert_notes:data.certNotes||'',
-      chks:data.chks||[false,false,false], wf_events:data.wfEvents||[], links:data.links||[],
-      version:nextVersion, modified_by:data.modifiedBy||'', updated_at:new Date().toISOString(),
-    }).select().single();
-    if(error) throw error;
-    return { version:saved.version, _etag:String(saved.version) };
-  }
-  if(parts[0]==='acctstate' && parts[1]){
-    const acctKey = decodeURIComponent(parts[1]);
-    const { error } = await sbClient.from('acct_state').upsert({
-      acct_key:acctKey, supporting:data.supporting||[], schedule_type:data.scheduleType||'none',
-      schedule_rows:data.scheduleRows||[], updated_at:new Date().toISOString(),
-    });
-    if(error) throw error;
-    return { ok:true };
-  }
-  if(parts[0]==='assignments' && parts[1]){
-    const recId = decodeURIComponent(parts[1]);
-    const { error } = await sbClient.from('assignments').upsert({
-      rec_id:recId, preparer:data.preparer||null, reviewer:data.reviewer||null,
-      approver:data.approver||null, updated_at:new Date().toISOString(),
-    });
-    if(error) throw error;
-    return { ok:true };
-  }
-  return null;
-}
-
-async function apiPost(path, data){
-  const sbClient = getSb();
-  if(!sbClient) return null;
-  const parts = path.split('/').filter(Boolean);
-  if(parts[0]==='users'){
-    const { error } = await sbClient.from('users').upsert({
-      email:data.email, name:data.name, role:data.role, initials:data.initials
-    }, { onConflict:'email' });
-    if(error) throw error;
-    return { ok:true };
-  }
-  return null;
-}
-
-async function apiDeleteUser(email){
-  const sbClient = getSb();
-  if(!sbClient) return;
-  const { error } = await sbClient.from('users').delete().eq('email', email);
-  if(error) throw error;
-}
 
 /* ══ POWER AUTOMATE NOTIFICATION CONFIG ══
    Set the HTTP trigger URL from your Power Automate flow.
@@ -1062,41 +876,23 @@ async function azGetUserRole(email){
 
 async function azLoadDashboardState(){
   try {
-    const sbClient = getSb() || window._sb;
-    if(!sbClient){ console.warn('[azLoadDashboardState] No Supabase client'); return; }
-    const { data, error } = await sbClient.from('rec_state').select('*');
-    if(error){ console.error('[azLoadDashboardState] Error:', error.message); throw error; }
-    console.log('[azLoadDashboardState] Raw data from Supabase:', data);
-    (data||[]).forEach(row => {
-      const id = row.rec_id;
-      if(ST[id]){
-        ST[id].status     = row.status     || 'open';
-        ST[id].openItems  = row.open_items || [];
-        ST[id].comments   = row.comments   || [];
-        ST[id].auditLog   = row.audit_log  || [];
-        ST[id].certStmt   = row.cert_stmt  || '';
-        ST[id].certNotes  = row.cert_notes || '';
-        ST[id].chks       = row.chks       || [false,false,false];
-        ST[id].wfEvents   = row.wf_events  || [];
-        ST[id].links      = row.links      || [];
-        ST[id].version    = row.version    || 0;
-        ST[id].modifiedBy = row.modified_by|| '';
+    let   items = await apiGet('/dashboard');
+    items.forEach(item => {
+      if(ST[item.recId]){
+        ST[item.recId].status     = item.status || 'open';
+        ST[item.recId].version    = item.version || 0;
+        ST[item.recId].modifiedBy = item.modifiedBy || '';
       }
     });
-    const loaded = (data||[]).length;
-    console.log('[azLoadDashboardState] Loaded', loaded, 'recs');
-    toast('Loaded ' + loaded + ' saved recs from Supabase', 'ok');
-  } catch(e){ console.warn('[azLoadDashboardState]', e.message); }
+  } catch(e){ console.warn('azLoadDashboardState:', e.message); }
 }
 
 async function azLoadRecState(recId){
   try {
-    const sbClient2 = getSb() || window._sb;
-    const item = sbClient2 ? await apiGet('/state/' + encodeURIComponent(recId)) : null;
+    const item = await apiGet('/state/' + encodeURIComponent(recId));
     if(item && item._etag) AZ_ETAGS[recId] = item._etag;
     if(item){
-      // Merge into ST directly so it persists
-      Object.assign(ST[recId], {
+      return {
         status:     item.status     || 'open',
         openItems:  item.openItems  || [],
         comments:   item.comments   || [],
@@ -1109,8 +905,7 @@ async function azLoadRecState(recId){
         attachments:[],
         version:    item.version    || 0,
         modifiedBy: item.modifiedBy || '',
-      });
-      return ST[recId];
+      };
     }
   } catch(e){ console.warn('azLoadRecState:', e.message); }
   return null;
@@ -1119,89 +914,67 @@ async function azLoadRecState(recId){
 async function azSaveRecState(recId){
   let   st = ST[recId];
   if(!st) return;
-  const sbClient = getSb() || window._sb || await getSbAsync();
-  if(!sbClient){ console.warn('[azSaveRecState] No Supabase client for', recId); return; }
   try {
-    const nextVersion = (st.version||0) + 1;
-    const { data:saved, error } = await sbClient.from('rec_state').upsert({
-      rec_id:      recId,
-      status:      st.status     || 'open',
-      open_items:  st.openItems  || [],
-      comments:    st.comments   || [],
-      audit_log:   st.auditLog   || [],
-      cert_stmt:   st.certStmt   || '',
-      cert_notes:  st.certNotes  || '',
-      chks:        st.chks       || [false,false,false],
-      wf_events:   st.wfEvents   || [],
-      links:       st.links      || [],
-      version:     nextVersion,
-      modified_by: CURRENT_USER?.name || '',
-      updated_at:  new Date().toISOString(),
-    }).select().single();
-    if(error) throw error;
-    if(saved) { AZ_ETAGS[recId] = String(saved.version); st.version = saved.version; }
-    console.log('[azSaveRecState] Saved:', recId, 'status:', st.status);
+    const saved = await apiPut(
+      '/state/' + encodeURIComponent(recId),
+      {
+        status:     st.status,
+        openItems:  st.openItems,
+        comments:   st.comments,
+        auditLog:   st.auditLog,
+        certStmt:   st.certStmt,
+        certNotes:  st.certNotes,
+        chks:       st.chks,
+        wfEvents:   st.wfEvents,
+        links:      st.links,
+        version:    st.version || 0,
+        modifiedBy: CURRENT_USER?.name || '',
+      },
+      AZ_ETAGS[recId] // send etag for conflict detection
+    );
+    if(saved._etag) AZ_ETAGS[recId] = saved._etag;
+    st.version = saved.version;
     setSaveIndicator(recId,'saved');
   } catch(e){
-    console.error('[azSaveRecState] Error:', e.message);
-    setSaveIndicator(recId,'error');
-    toast('Save failed — ' + e.message, 'err');
+    if(e.conflict){
+      setSaveIndicator(recId,'error');
+      showConflictDialog(recId, e.conflict);
+    } else {
+      setSaveIndicator(recId,'error');
+      toast('Save failed — ' + e.message, 'err');
+    }
   }
 }
 
 async function azLoadAcctState(recId){
   try {
-    const sbClient = getSb() || window._sb;
-    if(!sbClient) return;
-    const { data, error } = await sbClient.from('acct_state')
-      .select('*')
-      .like('acct_key', recId + '::%');
-    if(error) throw error;
-    if(!data || !data.length) return;
-    data.forEach(row=>{
-      if(!row || !row.acct_key) return;
-      ST_ACCT[row.acct_key] = {
-        supporting:   Array.isArray(row.supporting)   ? row.supporting   : [],
-        scheduleType: row.schedule_type || 'none',
-        scheduleRows: Array.isArray(row.schedule_rows) ? row.schedule_rows : [],
+    let   map = await apiGet('/acctstate/' + encodeURIComponent(recId));
+    Object.entries(map).forEach(([ak, item])=>{
+      ST_ACCT[ak] = {
+        supporting:   item.supporting   || [],
+        scheduleType: item.scheduleType || 'none',
+        scheduleRows: item.scheduleRows || [],
       };
     });
-    console.log('[azLoadAcctState] Loaded', data.length, 'accounts for', recId);
-  } catch(e){ console.warn('[azLoadAcctState]', e.message); }
+  } catch(e){ console.warn('azLoadAcctState:', e.message); }
 }
 
 async function azSaveAcctState(acctKey){
   let   ast = ST_ACCT[acctKey];
   if(!ast) return;
   try {
-    const sbClient = getSb() || window._sb;
-    if(!sbClient) return;
-    const { error } = await sbClient.from('acct_state').upsert({
-      acct_key:      acctKey,
-      supporting:    ast.supporting   || [],
-      schedule_type: ast.scheduleType || 'none',
-      schedule_rows: ast.scheduleRows || [],
-      updated_at:    new Date().toISOString(),
+    await apiPut('/acctstate/' + encodeURIComponent(acctKey), {
+      supporting:   ast.supporting,
+      scheduleType: ast.scheduleType,
+      scheduleRows: ast.scheduleRows,
     });
-    if(error) throw error;
-    console.log('[azSaveAcctState] Saved:', acctKey);
-  } catch(e){ console.warn('azSaveAcctState:', e.message); toast('Account save failed — ' + e.message,'err'); }
+  } catch(e){ toast('Account save failed — ' + e.message,'err'); }
 }
 
 async function azLoadAssignments(){
   try {
-    const sbClient = getSb() || window._sb;
-    if(!sbClient) return;
-    const { data, error } = await sbClient.from('assignments').select('*');
-    if(error) throw error;
-    (data||[]).forEach(row=>{
-      if(!row || !row.rec_id) return;
-      const a = {};
-      if(row.preparer!=null) a.preparer = row.preparer;
-      if(row.reviewer!=null) a.reviewer = row.reviewer;
-      if(row.approver!=null) a.approver = row.approver;
-      ASSIGNMENTS[row.rec_id] = a;
-    });
+    let   map = await apiGet('/assignments');
+    Object.assign(ASSIGNMENTS, map);
   } catch(e){ console.warn('azLoadAssignments:', e.message); }
 }
 
@@ -1215,13 +988,8 @@ async function azSaveAssignment(recId){
 
 async function azLoadUsers(){
   try {
-    const sbClient = getSb() || window._sb;
-    if(!sbClient) return;
-    const { data, error } = await sbClient.from('users').select('*').order('created_at',{ascending:true});
-    if(error) throw error;
-    if(data && Array.isArray(data)){
-      USERS = data.map((u,i) => ({ id: i+1, name:u.name, role:u.role, email:u.email, initials:u.initials||'' }));
-    }
+    let   items = await apiGet('/users');
+    USERS = items.map((u,i) => ({ id: i+1, name:u.name, role:u.role, email:u.email, initials:u.initials }));
   } catch(e){ console.warn('azLoadUsers:', e.message); }
 }
 
@@ -1242,7 +1010,7 @@ function scheduleAcctSave(acctKey){
   clearTimeout(AZ_SAVE_TIMERS['acct_'+acctKey]);
   AZ_SAVE_TIMERS['acct_'+acctKey] = setTimeout(()=>{
     if(AZ_MODE) azSaveAcctState(acctKey);
-  }, 1000);
+  }, 2000);
 }
 
 function setSaveIndicator(recId, state){
@@ -1307,9 +1075,15 @@ const SP_STATE_CONFIG = {
   // The file will be created if it doesn't exist
   filePath:  '/Shared Documents/ARE3000-Recon-State/ARE3000_Recon_State_Jun-2026.json',
 
-  syncInterval: 0,   // disabled — using Supabase instead
-  autoLoad: false,   // disabled — using Supabase instead
-  autoSave: false,   // disabled — using Supabase instead
+  // Auto-sync interval in seconds (0 = disabled)
+  // When enabled, the tool polls SharePoint for changes every N seconds
+  syncInterval: 30,
+
+  // Whether to auto-load state on startup
+  autoLoad: false,  // disabled — using Supabase
+
+  // Whether to auto-save after every workflow action
+  autoSave: false,  // disabled — using Supabase
 };
 
 let SP_SYNC_TIMER   = null;   // interval timer for auto-sync
@@ -1732,19 +1506,154 @@ async function spDeleteFile(serverRelativeUrl){
 const ST={};
 const ST_ACCT={};
 const ASSIGNMENTS={"CASH AND CASH EQUIVALENT||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "INTRAGROUP RECEIVABLES & LIABILITIES||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "OTHER CURRENT LIABILITIES & OTHER LIABILITIES||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "TRADE PAYABLES||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "PROPERTY PLANT & EQUIPMENT||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "POST EMPLOYMENT BENEFITS||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "RETAINED EARNINGS||3000": {"preparer": 2, "reviewer": 4, "approver": 6}, "SHARE CAPITAL||3000": {"preparer": 3, "reviewer": 5, "approver": 6}, "DEFERRED TAX ASSETS & DEFERRED TAX LIABILITIES||3000": {"preparer": 2, "reviewer": 4, "approver": 6}};
-const TODAY=new Date(); // current date — used for aging calculations
+const TODAY=new Date();
+/* ══ PERSISTENCE LAYER — Direct Supabase ══ */
+const SUPABASE_URL = 'https://bpfoixwlqjliexuaguwy.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s';
+
+// Clean acct_key — remove any encoding artifacts
+function cleanKey(k){ return String(k||'').replace(/\\x27/g,"'").replace(/\x27/g,"'"); }
+
+async function sbSaveRecState(recId){
+  const sb = getSb(); if(!sb) return;
+  const st = ST[recId]; if(!st) return;
+  try{
+    const {error} = await sb.from('rec_state').upsert({
+      rec_id:      recId,
+      status:      st.status||'open',
+      open_items:  st.openItems||[],
+      comments:    st.comments||[],
+      audit_log:   st.auditLog||[],
+      cert_stmt:   st.certStmt||'',
+      cert_notes:  st.certNotes||'',
+      chks:        st.chks||[false,false,false],
+      wf_events:   st.wfEvents||[],
+      links:       st.links||[],
+      version:     (st.version||0)+1,
+      modified_by: CURRENT_USER?.name||'',
+      updated_at:  new Date().toISOString(),
+    },{onConflict:'rec_id'});
+    if(error) throw error;
+    console.log('[sbSaveRecState] OK:', recId, st.status);
+    setSaveIndicator(recId,'saved');
+  }catch(e){
+    console.error('[sbSaveRecState] FAIL:', recId, e.message);
+    setSaveIndicator(recId,'error');
+    toast('Save failed: '+e.message,'err');
+  }
+}
+
+async function sbSaveAcctState(acctKey){
+  const sb = getSb(); if(!sb) return;
+  const key = cleanKey(acctKey);
+  const ast = ST_ACCT[key] || ST_ACCT[acctKey];
+  if(!ast) return;
+  try{
+    const {error} = await sb.from('acct_state').upsert({
+      acct_key:      key,
+      supporting:    ast.supporting||[],
+      schedule_type: ast.scheduleType||'none',
+      schedule_rows: ast.scheduleRows||[],
+      updated_at:    new Date().toISOString(),
+    },{onConflict:'acct_key'});
+    if(error) throw error;
+    console.log('[sbSaveAcctState] OK:', key, 'rows:', (ast.scheduleRows||[]).length);
+  }catch(e){
+    console.error('[sbSaveAcctState] FAIL:', key, e.message);
+  }
+}
+
+async function sbLoadAll(){
+  const sb = getSb(); if(!sb) return;
+  try{
+    // Load rec_state
+    const {data:recs, error:e1} = await sb.from('rec_state').select('*');
+    if(e1) throw e1;
+    (recs||[]).forEach(row=>{
+      if(ST[row.rec_id]){
+        Object.assign(ST[row.rec_id],{
+          status:     row.status||'open',
+          openItems:  row.open_items||[],
+          comments:   row.comments||[],
+          auditLog:   row.audit_log||[],
+          certStmt:   row.cert_stmt||'',
+          certNotes:  row.cert_notes||'',
+          chks:       row.chks||[false,false,false],
+          wfEvents:   row.wf_events||[],
+          links:      row.links||[],
+          version:    row.version||0,
+          modifiedBy: row.modified_by||'',
+        });
+      }
+    });
+    console.log('[sbLoadAll] rec_state loaded:', (recs||[]).length, 'recs');
+
+    // Load acct_state
+    const {data:accts, error:e2} = await sb.from('acct_state').select('*');
+    if(e2) throw e2;
+    (accts||[]).forEach(row=>{
+      const key = cleanKey(row.acct_key);
+      ST_ACCT[key] = {
+        supporting:   row.supporting||[],
+        scheduleType: row.schedule_type||'none',
+        scheduleRows: row.schedule_rows||[],
+      };
+    });
+    console.log('[sbLoadAll] acct_state loaded:', (accts||[]).length, 'accounts');
+  }catch(e){
+    console.error('[sbLoadAll] FAIL:', e.message);
+  }
+}
+
+// Override the old helper functions to use new direct functions
+function scheduleSave(recId){ if(AZ_MODE) sbSaveRecState(recId); }
+function scheduleAcctSave(acctKey){ if(AZ_MODE) sbSaveAcctState(acctKey); }
+function azSaveRecState(recId){ return sbSaveRecState(recId); }
+function azSaveAcctState(acctKey){ return sbSaveAcctState(acctKey); }
+async function azLoadDashboardState(){ await sbLoadAll(); }
+async function azLoadRecState(recId){
+  const sb = getSb(); if(!sb) return null;
+  try{
+    const {data,error} = await sb.from('rec_state').select('*').eq('rec_id',recId).maybeSingle();
+    if(error||!data) return null;
+    return {
+      status:data.status||'open', openItems:data.open_items||[],
+      comments:data.comments||[], auditLog:data.audit_log||[],
+      certStmt:data.cert_stmt||'', certNotes:data.cert_notes||'',
+      chks:data.chks||[false,false,false], wfEvents:data.wf_events||[],
+      links:data.links||[], version:data.version||0, modifiedBy:data.modified_by||'',
+    };
+  }catch(e){ return null; }
+}
+async function azLoadAcctState(recId){
+  const sb = getSb(); if(!sb) return;
+  try{
+    const {data,error} = await sb.from('acct_state').select('*').like('acct_key',recId+'::%');
+    if(error) throw error;
+    (data||[]).forEach(row=>{
+      const key = cleanKey(row.acct_key);
+      ST_ACCT[key] = {
+        supporting:   row.supporting||[],
+        scheduleType: row.schedule_type||'none',
+        scheduleRows: row.schedule_rows||[],
+      };
+    });
+  }catch(e){ console.error('[azLoadAcctState]',e.message); }
+}
+async function azLoadAssignments(){}
+async function azLoadUsers(){}
+
 const AUTO_CERT_RULES={zeroBalance:true,zeroMovement:false,noOpenItems:true,allCheckboxes:false,matchPriorPeriod:false};
 const SORT={col:'fsli',dir:'asc'};
 let ASSIGN_F='ALL';
 let SEL_RECS=new Set();
-let UID_CTR=6;
 let CUR_RPT=null;
 let NOTIFICATIONS=[];
 let NOTIF_OPEN=false;
 let ENTITY_DD_OPEN=false;
 let CURRENT_ENTITY=null;
 let F={risk:'ALL',status:'ALL',fsli:'ALL',are:'ALL',q:'',oiage:'ALL'};
-let ZERO_BAL_ONLY=false;
+let ZERO_BAL_ONLY=false; // current date — used for aging calculations
 RD.forEach(r=>{ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[]};});
 function checkAutoCertify(r){
   if(!r)return false;
@@ -1898,46 +1807,56 @@ function applyLoginUI(){
   document.getElementById('navAutoCert').style.display='';
 }
 function selectRole(r,el){SEL_ROLE=r;document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));el.classList.add('sel');validateLogin();}
+function validateLogin(){document.getElementById('loginBtn').disabled=!(document.getElementById('loginName').value.trim()&&SEL_ROLE);}
+
 function validateLogin(){
-  const email = (document.getElementById('loginEmail')||{}).value?.trim();
-  const pw    = (document.getElementById('loginPassword')||{}).value;
-  const btn   = document.getElementById('loginBtn');
-  if(btn) btn.disabled = !(email && pw);
+  const email=(document.getElementById('loginEmail')||{}).value?.trim();
+  const pw=(document.getElementById('loginPassword')||{}).value;
+  const btn=document.getElementById('loginBtn');
+  if(btn) btn.disabled=!(email&&pw);
 }
+
 async function doLogin(){
-  const email    = (document.getElementById('loginEmail')||{}).value?.trim();
-  const password = (document.getElementById('loginPassword')||{}).value;
-  const btn      = document.getElementById('loginBtn');
-  const errEl    = document.getElementById('loginErr');
-  errEl.style.display = 'none';
-  btn.disabled = true; btn.textContent = 'Signing in…';
-  try {
-    const sbClient = getSb();
-    if(!sbClient) throw new Error('Supabase not initialized');
-    // Sign in with Supabase Auth
-    const { error: authErr } = await sbClient.auth.signInWithPassword({ email, password });
+  const email=(document.getElementById('loginEmail')||{}).value?.trim();
+  const pw=(document.getElementById('loginPassword')||{}).value;
+  const btn=document.getElementById('loginBtn');
+  const errEl=document.getElementById('loginErr');
+  errEl.style.display='none';
+  btn.disabled=true; btn.textContent='Signing in…';
+  try{
+    const sb=getSb();
+    if(!sb) throw new Error('Supabase not ready');
+    const {error:authErr}=await sb.auth.signInWithPassword({email,password:pw});
     if(authErr) throw authErr;
-    // Look up role from hardcoded map
-    const USER_MAP = {
-  'jeffknight2002@gmail.com': {name:'Jefferson Cafe', role:'admin',    initials:'JC'},
-  'kulasong@test.com':        {name:'Kula Song',      role:'preparer', initials:'KS'},
-  'tester1@gmail.com':        {name:'Tester One',     role:'preparer', initials:'T1'},
-  'tester2@gmail.com':        {name:'Tester Two',     role:'preparer', initials:'T2'},
-  'tester3@gmail.com':        {name:'Tester Three',   role:'reviewer', initials:'T3'},
-  'tester4@gmail.com':        {name:'Tester Four',    role:'reviewer', initials:'T4'},
-  'tester5@gmail.com':        {name:'Tester Five',    role:'approver', initials:'T5'},
-};
-    const profile = USER_MAP[email.toLowerCase()];
-    if(!profile) throw new Error('No role assigned for ' + email + '. Contact your admin.');
-    const avCls = {preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
-    CURRENT_USER = { name:profile.name, role:profile.role, email:email, initials:profile.initials, avCls };
+    const USER_MAP={"jeffknight2002@gmail.com": {"name": "Jefferson Cafe", "role": "admin", "initials": "JC"}, "kulasong@test.com": {"name": "Kula Song", "role": "preparer", "initials": "KS"}, "tester1@gmail.com": {"name": "Tester One", "role": "preparer", "initials": "T1"}, "tester2@gmail.com": {"name": "Tester Two", "role": "preparer", "initials": "T2"}, "tester3@gmail.com": {"name": "Tester Three", "role": "reviewer", "initials": "T3"}, "tester4@gmail.com": {"name": "Tester Four", "role": "reviewer", "initials": "T4"}, "tester5@gmail.com": {"name": "Tester Five", "role": "approver", "initials": "T5"}};
+    const profile=USER_MAP[email.toLowerCase()];
+    if(!profile) throw new Error('No role for '+email+'. Contact admin.');
+    const avCls={preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[profile.role]||'av-adm';
+    CURRENT_USER={name:profile.name,role:profile.role,email,initials:profile.initials,avCls};
     await bootApp(false);
-  } catch(e) {
-    errEl.textContent = e.message || 'Sign-in failed';
-    errEl.style.display = '';
-    btn.disabled = false; btn.textContent = 'Sign In';
+  }catch(e){
+    errEl.textContent=e.message||'Sign-in failed';
+    errEl.style.display='';
+    btn.disabled=false; btn.textContent='Sign In';
   }
 }
+
+async function doLogout(){
+  if(!confirm('Sign out?')) return;
+  const sb=getSb();
+  if(sb) await sb.auth.signOut();
+  CURRENT_USER=null;
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('mainApp').style.display='none';
+}
+
+function selectRole(role,el){
+  SEL_ROLE=role;
+  document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  validateLogin();
+}
+
 function doLogout(){if(!confirm('Sign out?'))return;CURRENT_USER=null;SEL_ROLE='';document.getElementById('loginScreen').style.display='';document.getElementById('mainApp').style.display='none';document.getElementById('loginName').value='';document.querySelectorAll('.role-card').forEach(c=>c.classList.remove('sel'));document.getElementById('loginBtn').disabled=true;NOTIFICATIONS=[];}
 function initDropdowns(){
   const fs=[...new Set(RD.map(r=>r.fsli))].sort();
@@ -2882,7 +2801,7 @@ function returnRec(){
       preparer:ASSIGNMENTS[CURRID]?.preparer||'',
       reviewer:ASSIGNMENTS[CURRID]?.reviewer||'',
       approver:ASSIGNMENTS[CURRID]?.approver||''}});
-  if(AZ_MODE) azSaveRecState(CURRID); // immediate save
+  if(AZ_MODE)scheduleSave(CURRID);
   updateRoleUI();renderRecForm();renderDash();
   toast('Returned to Preparer','ok');
 }
@@ -2900,8 +2819,11 @@ function setStatus(s){
   if(s==='certified')st.wfEvents.push({step:'lock',user:'System',ts:now(),note:'Period Jun 2026 locked'});
   logAudit(CURRID,'Status changed to: '+sbLabel(s));
   const r3=RD.find(x=>x.id===CURRID);
-  // notifications disabled during testing
-  if(AZ_MODE) azSaveRecState(CURRID); // immediate save for workflow changes
+  // notification disabled
+if(false&&s==='in_review')pushNotif({type:'pending',title:'Submitted for Review',msg:(CURRENT_USER?.name||'Preparer')+' submitted '+r3.fsli+' · ARE '+r3.are+' for review.',recId:CURRID});
+  else if(s==='reviewed')pushNotif({type:'pending',title:'Passed to Approver',msg:(CURRENT_USER?.name||'Reviewer')+' reviewed '+r3.fsli+' · ARE '+r3.are+' — ready for final approval.',recId:CURRID});
+  else if(s==='returned')pushNotif({type:'returned',title:'Returned',msg:(CURRENT_USER?.name||'User')+' returned '+r3.fsli+' · ARE '+r3.are+'. Please review and resubmit.',recId:CURRID});
+  if(AZ_MODE) sbSaveRecState(CURRID);
   updateRoleUI();renderRecForm();renderDash();toast('Status: '+sbLabel(s),'ok');
 }
 function certifyRec(){
@@ -2918,8 +2840,8 @@ function certifyRec(){
   st.wfEvents.push({step:'approve',user:CURRENT_USER?.name||'Approver',ts:now(),note:stmt});
   st.wfEvents.push({step:'lock',user:'System',ts:now(),note:'Period Jun 2026 locked'});
   logAudit(CURRID,'Certified by '+(CURRENT_USER?.name||'Approver'));
-  // notification disabled
-  if(AZ_MODE) azSaveRecState(CURRID); // immediate save
+  pushNotif({type:'approved',title:'Certified',msg:(CURRENT_USER?.name||'Approver')+' certified '+r2.fsli+' · ARE '+r2.are+'. Period balance locked.',recId:CURRID});
+  if(AZ_MODE) sbSaveRecState(CURRID);
   updateRoleUI();renderRecForm();renderDash();renderKpis();toast('Reconciliation certified ✓','ok');
 }
 function toggleGL(){let   el=document.getElementById('glAcctsWrap'),btn=document.getElementById('glToggleBtn');const show=el.style.display==='none';el.style.display=show?'':'none';btn.innerHTML=show?'Hide accounts <i class="ti ti-chevron-up"></i>':'Show accounts <i class="ti ti-chevron-down"></i>';}
@@ -5220,8 +5142,6 @@ function showManualLogin(){
 }
 
 async function bootApp(isReturning){
-  // Persist session across soft refreshes
-  try { sessionStorage.setItem('currentUser', JSON.stringify(CURRENT_USER)); } catch(e){}
   console.log('bootApp called, isAdm:', isAdm, 'CURRENT_USER:', CURRENT_USER?.name);
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='flex';
@@ -5241,7 +5161,7 @@ async function bootApp(isReturning){
     if(c.dataset.v==='ALL') c.classList.add('on','navy');
   });
   if(AZ_MODE){
-    await Promise.all([azLoadDashboardState(),azLoadAssignments(),azLoadUsers()]);
+    await sbLoadAll(); // single call loads rec_state + acct_state
     startAutoRefresh();
   }
   if(SP_STATE_CONFIG.autoLoad&&SP_STATE_CONFIG.filePath){
@@ -5277,21 +5197,15 @@ async function bootApp(isReturning){
 
 // Auto-login exposed globally so boot script can call it
 window.addEventListener('DOMContentLoaded', async function(){
-  // Initialize default ST
   RD.forEach(function(r){
-    if(!ST[r.id]) ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[],returnHistory:[]};
+    if(!ST[r.id]) ST[r.id]={status:'open',openItems:[],comments:[],auditLog:[],
+      certStmt:'',certNotes:'',chks:[false,false,false],attachments:[],links:[],wfEvents:[],returnHistory:[]};
   });
-  // Always sign out any existing Supabase session on page load
-  // Each user must explicitly log in every time
-  try {
-    const sbClient = getSb();
-    if(sbClient){ await sbClient.auth.signOut(); }
-  } catch(e){}
-  // Always show login screen
+  const sb=getSb();
+  if(sb){ try{ await sb.auth.signOut(); }catch(e){} }
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('mainApp').style.display='none';
 });
-
 
 // Expose all functions globally
 window.getApiBase=getApiBase;
@@ -5490,33 +5404,6 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 </script>
