@@ -2586,7 +2586,7 @@ function autoCertifySingle(id){
   ];
   st.auditLog.push({ts,msg:'Auto-certified — meets auto-certification criteria',user:CURRENT_USER?.name||'System'});
   logAudit(realId,'Auto-certified by '+(CURRENT_USER?.name||'System'));
-  pushNotif({type:'approved',title:'Auto-Certified',msg:r.fsli+' · ARE '+r.are+' was auto-certified ('+( Math.abs(r.gl)<0.01?'zero balance':'no movement')+').',recId:realId});
+  // notification disabled
   renderDash();renderKpis();toast('Auto-certified ✓','ok');
 }
 
@@ -2621,15 +2621,7 @@ function returnRec(){
   });
   logAudit(CURRID,'Returned by '+(CURRENT_USER?.name||'User')+': '+reason.trim());
   const prepRecips = getRecipients(CURRID,['preparer']);
-  pushNotif({type:'returned',title:'Reconciliation Returned',
-    msg:(CURRENT_USER?.name||'User')+' returned '+r?.fsli+' · ARE '+r?.are+'. Reason: '+reason.trim(),
-    recId:CURRID, recipients:prepRecips,
-    extraData:{action:'rework',actionLabel:'Rework Now',
-      returnReason:reason.trim(),
-      returnedBy:CURRENT_USER?.name||'',
-      preparer:ASSIGNMENTS[CURRID]?.preparer||'',
-      reviewer:ASSIGNMENTS[CURRID]?.reviewer||'',
-      approver:ASSIGNMENTS[CURRID]?.approver||''}});
+  // notification disabled during testing
   if(AZ_MODE)scheduleSave(CURRID);
   updateRoleUI();renderRecForm();renderDash();
   toast('Returned to Preparer','ok');
@@ -2648,9 +2640,7 @@ function setStatus(s){
   if(s==='certified')st.wfEvents.push({step:'lock',user:'System',ts:now(),note:'Period Jun 2026 locked'});
   logAudit(CURRID,'Status changed to: '+sbLabel(s));
   const r3=RD.find(x=>x.id===CURRID);
-  if(s==='in_review')pushNotif({type:'pending',title:'Submitted for Review',msg:(CURRENT_USER?.name||'Preparer')+' submitted '+r3.fsli+' · ARE '+r3.are+' for review.',recId:CURRID});
-  else if(s==='reviewed')pushNotif({type:'pending',title:'Passed to Approver',msg:(CURRENT_USER?.name||'Reviewer')+' reviewed '+r3.fsli+' · ARE '+r3.are+' — ready for final approval.',recId:CURRID});
-  else if(s==='returned')pushNotif({type:'returned',title:'Returned',msg:(CURRENT_USER?.name||'User')+' returned '+r3.fsli+' · ARE '+r3.are+'. Please review and resubmit.',recId:CURRID});
+  // notifications disabled during testing
   if(AZ_MODE)scheduleSave(CURRID);
   updateRoleUI();renderRecForm();renderDash();toast('Status: '+sbLabel(s),'ok');
 }
@@ -2668,7 +2658,7 @@ function certifyRec(){
   st.wfEvents.push({step:'approve',user:CURRENT_USER?.name||'Approver',ts:now(),note:stmt});
   st.wfEvents.push({step:'lock',user:'System',ts:now(),note:'Period Jun 2026 locked'});
   logAudit(CURRID,'Certified by '+(CURRENT_USER?.name||'Approver'));
-  pushNotif({type:'approved',title:'Certified',msg:(CURRENT_USER?.name||'Approver')+' certified '+r2.fsli+' · ARE '+r2.are+'. Period balance locked.',recId:CURRID});
+  // notification disabled during testing
   if(AZ_MODE)scheduleSave(CURRID);
   updateRoleUI();renderRecForm();renderDash();renderKpis();toast('Reconciliation certified ✓','ok');
 }
