@@ -811,6 +811,8 @@ button{cursor:pointer}
 
 
 
+
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -1111,14 +1113,20 @@ async function azSaveRecState(recId){
 
 async function azLoadAcctState(recId){
   try {
-    let   map = await apiGet('/acctstate/' + encodeURIComponent(recId));
-    Object.entries(map).forEach(([ak, item])=>{
-      ST_ACCT[ak] = {
-        supporting:   item.supporting   || [],
-        scheduleType: item.scheduleType || 'none',
-        scheduleRows: item.scheduleRows || [],
+    const sbClient = getSb();
+    if(!sbClient) return;
+    const { data, error } = await sbClient.from('acct_state')
+      .select('*')
+      .like('acct_key', recId + '::%');
+    if(error) throw error;
+    (data||[]).forEach(row=>{
+      ST_ACCT[row.acct_key] = {
+        supporting:   row.supporting   || [],
+        scheduleType: row.schedule_type || 'none',
+        scheduleRows: row.schedule_rows || [],
       };
     });
+    console.log('[azLoadAcctState] Loaded', (data||[]).length, 'accounts for', recId);
   } catch(e){ console.warn('azLoadAcctState:', e.message); }
 }
 
@@ -1126,12 +1134,18 @@ async function azSaveAcctState(acctKey){
   let   ast = ST_ACCT[acctKey];
   if(!ast) return;
   try {
-    await apiPut('/acctstate/' + encodeURIComponent(acctKey), {
-      supporting:   ast.supporting,
-      scheduleType: ast.scheduleType,
-      scheduleRows: ast.scheduleRows,
+    const sbClient = getSb();
+    if(!sbClient) return;
+    const { error } = await sbClient.from('acct_state').upsert({
+      acct_key:      acctKey,
+      supporting:    ast.supporting   || [],
+      schedule_type: ast.scheduleType || 'none',
+      schedule_rows: ast.scheduleRows || [],
+      updated_at:    new Date().toISOString(),
     });
-  } catch(e){ toast('Account save failed — ' + e.message,'err'); }
+    if(error) throw error;
+    console.log('[azSaveAcctState] Saved:', acctKey);
+  } catch(e){ console.warn('azSaveAcctState:', e.message); toast('Account save failed — ' + e.message,'err'); }
 }
 
 async function azLoadAssignments(){
@@ -1173,7 +1187,7 @@ function scheduleAcctSave(acctKey){
   clearTimeout(AZ_SAVE_TIMERS['acct_'+acctKey]);
   AZ_SAVE_TIMERS['acct_'+acctKey] = setTimeout(()=>{
     if(AZ_MODE) azSaveAcctState(acctKey);
-  }, 2000);
+  }, 1000);
 }
 
 function setSaveIndicator(recId, state){
@@ -2813,7 +2827,7 @@ function returnRec(){
       preparer:ASSIGNMENTS[CURRID]?.preparer||'',
       reviewer:ASSIGNMENTS[CURRID]?.reviewer||'',
       approver:ASSIGNMENTS[CURRID]?.approver||''}});
-  if(AZ_MODE)scheduleSave(CURRID);
+  if(AZ_MODE) azSaveRecState(CURRID); // immediate save
   updateRoleUI();renderRecForm();renderDash();
   toast('Returned to Preparer','ok');
 }
@@ -2832,7 +2846,7 @@ function setStatus(s){
   logAudit(CURRID,'Status changed to: '+sbLabel(s));
   const r3=RD.find(x=>x.id===CURRID);
   // notifications disabled during testing
-  if(AZ_MODE)scheduleSave(CURRID);
+  if(AZ_MODE) azSaveRecState(CURRID); // immediate save for workflow changes
   updateRoleUI();renderRecForm();renderDash();toast('Status: '+sbLabel(s),'ok');
 }
 function certifyRec(){
@@ -2850,7 +2864,7 @@ function certifyRec(){
   st.wfEvents.push({step:'lock',user:'System',ts:now(),note:'Period Jun 2026 locked'});
   logAudit(CURRID,'Certified by '+(CURRENT_USER?.name||'Approver'));
   // notification disabled
-  if(AZ_MODE)scheduleSave(CURRID);
+  if(AZ_MODE) azSaveRecState(CURRID); // immediate save
   updateRoleUI();renderRecForm();renderDash();renderKpis();toast('Reconciliation certified ✓','ok');
 }
 function toggleGL(){let   el=document.getElementById('glAcctsWrap'),btn=document.getElementById('glToggleBtn');const show=el.style.display==='none';el.style.display=show?'':'none';btn.innerHTML=show?'Hide accounts <i class="ti ti-chevron-up"></i>':'Show accounts <i class="ti ti-chevron-down"></i>';}
@@ -5440,6 +5454,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
