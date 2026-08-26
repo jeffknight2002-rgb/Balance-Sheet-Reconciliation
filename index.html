@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +10,12 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script>
 (function(){
-  if(typeof window.supabase!=='undefined'){ window._sb=window.supabase.createClient('https://bpfoixwlqjliexuaguwy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s'); console.log('[Supabase] Ready'); }
+  if(typeof window.supabase!=='undefined'){
+    window._sb=window.supabase.createClient('https://bpfoixwlqjliexuaguwy.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s');
+    console.log('[Supabase] Ready');
+  }
+  // Define getSb globally so it's available before main script runs
+  window.getSb = function(){ return window._sb || null; };
 })();
 </script>
 <style>
