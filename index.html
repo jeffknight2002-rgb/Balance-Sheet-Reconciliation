@@ -809,6 +809,8 @@ button{cursor:pointer}
 
 
 
+
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -1023,11 +1025,11 @@ async function azGetUserRole(email){
 
 async function azLoadDashboardState(){
   try {
-    // Load full state for ALL recs from rec_state table
     const sbClient = getSb();
-    if(!sbClient) return;
+    if(!sbClient){ console.warn('[azLoadDashboardState] No Supabase client'); return; }
     const { data, error } = await sbClient.from('rec_state').select('*');
-    if(error) throw error;
+    if(error){ console.error('[azLoadDashboardState] Error:', error.message); throw error; }
+    console.log('[azLoadDashboardState] Raw data from Supabase:', data);
     (data||[]).forEach(row => {
       const id = row.rec_id;
       if(ST[id]){
@@ -1044,8 +1046,10 @@ async function azLoadDashboardState(){
         ST[id].modifiedBy = row.modified_by|| '';
       }
     });
-    console.log('[azLoadDashboardState] Loaded', (data||[]).length, 'recs from Supabase');
-  } catch(e){ console.warn('azLoadDashboardState:', e.message); }
+    const loaded = (data||[]).length;
+    console.log('[azLoadDashboardState] Loaded', loaded, 'recs');
+    toast('Loaded ' + loaded + ' saved recs from Supabase', 'ok');
+  } catch(e){ console.warn('[azLoadDashboardState]', e.message); }
 }
 
 async function azLoadRecState(recId){
@@ -1234,15 +1238,9 @@ const SP_STATE_CONFIG = {
   // The file will be created if it doesn't exist
   filePath:  '/Shared Documents/ARE3000-Recon-State/ARE3000_Recon_State_Jun-2026.json',
 
-  // Auto-sync interval in seconds (0 = disabled)
-  // When enabled, the tool polls SharePoint for changes every N seconds
-  syncInterval: 30,
-
-  // Whether to auto-load state on startup
-  autoLoad: true,
-
-  // Whether to auto-save after every workflow action
-  autoSave: true,
+  syncInterval: 0,   // disabled — using Supabase instead
+  autoLoad: false,   // disabled — using Supabase instead
+  autoSave: false,   // disabled — using Supabase instead
 };
 
 let SP_SYNC_TIMER   = null;   // interval timer for auto-sync
@@ -5442,6 +5440,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
