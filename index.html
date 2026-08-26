@@ -813,6 +813,7 @@ button{cursor:pointer}
 
 
 
+
 let USERS=[{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
 
 
@@ -843,11 +844,25 @@ const SUPABASE_CONFIG = {
 let _sb = null;
 function getSb(){
   if(_sb) return _sb;
-  if(typeof window.supabase !== 'undefined'){
+  if(typeof window.supabase !== 'undefined' && window.supabase.createClient){
     _sb = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
     console.log('[Supabase] Client initialized ✓');
+    return _sb;
   }
-  return _sb;
+  console.warn('[Supabase] window.supabase not ready yet');
+  return null;
+}
+async function getSbAsync(maxWait=5000){
+  if(getSb()) return _sb;
+  const start = Date.now();
+  while(Date.now()-start < maxWait){
+    await new Promise(r=>setTimeout(r,100));
+    if(typeof window.supabase !== 'undefined' && window.supabase.createClient){
+      return getSb();
+    }
+  }
+  console.error('[Supabase] Timeout waiting for client');
+  return null;
 }
 
 async function apiGet(path){
@@ -1083,29 +1098,31 @@ async function azLoadRecState(recId){
 async function azSaveRecState(recId){
   let   st = ST[recId];
   if(!st) return;
+  const sbClient = await getSbAsync();
+  if(!sbClient){ console.warn('[azSaveRecState] No Supabase client for', recId); return; }
   try {
-    const saved = await apiPut(
-      '/state/' + encodeURIComponent(recId),
-      {
-        status:     st.status     || 'open',
-        openItems:  st.openItems  || [],
-        comments:   st.comments   || [],
-        auditLog:   st.auditLog   || [],
-        certStmt:   st.certStmt   || '',
-        certNotes:  st.certNotes  || '',
-        chks:       st.chks       || [false,false,false],
-        wfEvents:   st.wfEvents   || [],
-        links:      st.links      || [],
-        version:    st.version    || 0,
-        modifiedBy: CURRENT_USER?.name || '',
-      },
-      AZ_ETAGS[recId]
-    );
-    if(saved && saved._etag) AZ_ETAGS[recId] = saved._etag;
-    if(saved && saved.version) st.version = saved.version;
+    const nextVersion = (st.version||0) + 1;
+    const { data:saved, error } = await sbClient.from('rec_state').upsert({
+      rec_id:      recId,
+      status:      st.status     || 'open',
+      open_items:  st.openItems  || [],
+      comments:    st.comments   || [],
+      audit_log:   st.auditLog   || [],
+      cert_stmt:   st.certStmt   || '',
+      cert_notes:  st.certNotes  || '',
+      chks:        st.chks       || [false,false,false],
+      wf_events:   st.wfEvents   || [],
+      links:       st.links      || [],
+      version:     nextVersion,
+      modified_by: CURRENT_USER?.name || '',
+      updated_at:  new Date().toISOString(),
+    }).select().single();
+    if(error) throw error;
+    if(saved) { AZ_ETAGS[recId] = String(saved.version); st.version = saved.version; }
+    console.log('[azSaveRecState] Saved:', recId, 'status:', st.status);
     setSaveIndicator(recId,'saved');
   } catch(e){
-    console.warn('azSaveRecState error:', e.message);
+    console.error('[azSaveRecState] Error:', e.message);
     setSaveIndicator(recId,'error');
     toast('Save failed — ' + e.message, 'err');
   }
@@ -1166,7 +1183,9 @@ async function azSaveAssignment(recId){
 async function azLoadUsers(){
   try {
     let   items = await apiGet('/users');
-    USERS = items.map((u,i) => ({ id: i+1, name:u.name, role:u.role, email:u.email, initials:u.initials }));
+    if(items && Array.isArray(items)){
+      USERS = items.map((u,i) => ({ id: i+1, name:u.name, role:u.role, email:u.email, initials:u.initials }));
+    }
   } catch(e){ console.warn('azLoadUsers:', e.message); }
 }
 
@@ -5454,6 +5473,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
