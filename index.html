@@ -6,6 +6,7 @@
 <title>Account Reconciliation · ARE 3000 · Jun 2026</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css"/>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 :root{
   --navy:#1B3A5C;--navy2:#16324F;
@@ -840,18 +841,114 @@ async function azGetCurrentUser(){
 }
 
 /* ══ API CLIENT ══ */
-async function apiGet(path,data){
-  return null; // local file mode
+/* ══ SUPABASE CONFIG ══ */
+const SUPABASE_CONFIG = {
+  url:     'https://bpfoixwlqjliexuaguwy.supabase.co',
+  anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJwZm9peHdscWpsaWV4dWFndXd5Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc0OTEyMzEsImV4cCI6MjEwMzA2NzIzMX0.WGKPm8hu8VwjG5vAEEDyRxZd9qYmJCLiVulSTTQu__s',
+};
+const sb = (typeof window.supabase !== 'undefined')
+  ? window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey)
+  : null;
+
+async function apiGet(path){
+  if(!sb) return null;
+  const parts = path.split('/').filter(Boolean);
+  if(parts[0]==='dashboard'){
+    const { data, error } = await sb.from('rec_state').select('rec_id,status,version,modified_by');
+    if(error) throw error;
+    return (data||[]).map(r=>({ recId:r.rec_id, status:r.status, version:r.version, modifiedBy:r.modified_by }));
+  }
+  if(parts[0]==='state' && parts[1]){
+    const recId = decodeURIComponent(parts[1]);
+    const { data, error } = await sb.from('rec_state').select('*').eq('rec_id', recId).maybeSingle();
+    if(error) throw error;
+    if(!data) return null;
+    return { status:data.status, openItems:data.open_items, comments:data.comments, auditLog:data.audit_log,
+      certStmt:data.cert_stmt, certNotes:data.cert_notes, chks:data.chks, wfEvents:data.wf_events,
+      links:data.links, version:data.version, modifiedBy:data.modified_by, _etag:String(data.version) };
+  }
+  if(parts[0]==='acctstate' && parts[1]){
+    const recId = decodeURIComponent(parts[1]);
+    const { data, error } = await sb.from('acct_state').select('*').like('acct_key', recId+'::%');
+    if(error) throw error;
+    const map = {};
+    (data||[]).forEach(row=>{ map[row.acct_key] = { supporting:row.supporting, scheduleType:row.schedule_type, scheduleRows:row.schedule_rows }; });
+    return map;
+  }
+  if(parts[0]==='assignments'){
+    const { data, error } = await sb.from('assignments').select('*');
+    if(error) throw error;
+    const map = {};
+    (data||[]).forEach(row=>{ const a={}; if(row.preparer!=null) a.preparer=row.preparer; if(row.reviewer!=null) a.reviewer=row.reviewer; if(row.approver!=null) a.approver=row.approver; map[row.rec_id]=a; });
+    return map;
+  }
+  if(parts[0]==='users' && !parts[1]){
+    const { data, error } = await sb.from('users').select('*').order('created_at', { ascending:true });
+    if(error) throw error;
+    return (data||[]).map(u=>({ name:u.name, role:u.role, email:u.email, initials:u.initials }));
+  }
+  if(parts[0]==='users' && parts[1]){
+    const email = decodeURIComponent(parts[1]);
+    const { data, error } = await sb.from('users').select('*').eq('email', email).maybeSingle();
+    if(error) throw error;
+    if(!data) return null;
+    return { name:data.name, role:data.role, email:data.email, initials:data.initials };
+  }
+  return null;
 }
 
-async function apiPut(path,data){
-  return null; // local file mode
+async function apiPut(path, data, etag){
+  if(!sb) return null;
+  const parts = path.split('/').filter(Boolean);
+  if(parts[0]==='state' && parts[1]){
+    const recId = decodeURIComponent(parts[1]);
+    const nextVersion = (data.version||0) + 1;
+    const { data:saved, error } = await sb.from('rec_state').upsert({
+      rec_id:recId, status:data.status, open_items:data.openItems, comments:data.comments,
+      audit_log:data.auditLog, cert_stmt:data.certStmt, cert_notes:data.certNotes, chks:data.chks,
+      wf_events:data.wfEvents, links:data.links, version:nextVersion, modified_by:data.modifiedBy,
+      updated_at:new Date().toISOString(),
+    }).select().single();
+    if(error) throw error;
+    return { version:saved.version, _etag:String(saved.version) };
+  }
+  if(parts[0]==='acctstate' && parts[1]){
+    const acctKey = decodeURIComponent(parts[1]);
+    const { error } = await sb.from('acct_state').upsert({
+      acct_key:acctKey, supporting:data.supporting, schedule_type:data.scheduleType,
+      schedule_rows:data.scheduleRows, updated_at:new Date().toISOString(),
+    });
+    if(error) throw error;
+    return { ok:true };
+  }
+  if(parts[0]==='assignments' && parts[1]){
+    const recId = decodeURIComponent(parts[1]);
+    const { error } = await sb.from('assignments').upsert({
+      rec_id:recId, preparer:data.preparer||null, reviewer:data.reviewer||null, approver:data.approver||null,
+      updated_at:new Date().toISOString(),
+    });
+    if(error) throw error;
+    return { ok:true };
+  }
+  return null;
 }
 
-async function apiPost(path,data){
-  return null; // local file mode
+async function apiPost(path, data){
+  if(!sb) return null;
+  const parts = path.split('/').filter(Boolean);
+  if(parts[0]==='users'){
+    const { error } = await sb.from('users').upsert({ email:data.email, name:data.name, role:data.role, initials:data.initials }, { onConflict:'email' });
+    if(error) throw error;
+    return { ok:true };
+  }
+  return null;
 }
 
+async function apiDeleteUser(email){
+  if(!sb) return;
+  const { error } = await sb.from('users').delete().eq('email', email);
+  if(error) throw error;
+}
 /* ══ DATA LAYER ══ */
 let AZ_ETAGS = {};       // etag per recId for conflict detection
 let AZ_SAVE_TIMERS = {}; // debounce timers
@@ -1049,7 +1146,7 @@ function startAutoRefresh(){
   }, 60000);
 }
 
-let AZ_MODE = false; // true when running in Azure Static Web Apps
+let AZ_MODE = true; // Supabase mode
 
 /* ══ SHAREPOINT ATTACHMENT CONFIG ══ */
 const SP_ATTACH_CONFIG = {
@@ -1678,7 +1775,10 @@ function doLogin(){
   if(!name||!SEL_ROLE)return;
   let   initials=name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
   const avCls={preparer:'av-prep',reviewer:'av-rev',approver:'av-app',admin:'av-adm'}[SEL_ROLE]||'av-adm';
-  CURRENT_USER={name,role:SEL_ROLE,initials,avCls};
+  // Map name to email for Supabase tracking
+  const emailMap={'Jefferson Cafe':'jeffknight2002@gmail.com','Tester One':'tester1@gmail.com','Tester Two':'tester2@gmail.com','Tester Three':'tester3@gmail.com','Tester Four':'tester4@gmail.com','Tester Five':'tester5@gmail.com','Kula Song':'kulasong@test.com'};
+  const email = emailMap[name] || (name.toLowerCase().replace(/\s+/g,'.')+('@test.com'));
+  CURRENT_USER={name,role:SEL_ROLE,initials,avCls,email};
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('mainApp').style.display='flex';
   applyLoginUI();initDropdowns();
