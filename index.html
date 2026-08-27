@@ -815,6 +815,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -1557,9 +1558,7 @@ async function sbSaveAcctState(acctKey){
   const key = cleanKey(acctKey);
   const ast = ST_ACCT[key] || ST_ACCT[acctKey];
   if(!ast) return;
-  // Only save if there's actual data — don't overwrite real data with empty rows
-  const hasData = (ast.supporting||[]).length > 0 || (ast.scheduleRows||[]).length > 0 || ast.scheduleType !== 'none';
-  if(!hasData) return;
+  // Always save — caller is responsible for not calling with empty data
   try{
     const {error} = await sb.from('acct_state').upsert({
       acct_key:      key,
@@ -2415,7 +2414,8 @@ function setAcctTmpl(ak,idx,type){
     else if(!ast.scheduleRows.length){let   def=TMPL_DEFS[type];if(def){let   row={};def.cols.forEach(c=>{row[c.key]='';});ast.scheduleRows.push(row);}}
   }
   logAudit(CURRID,'Schedule template set ['+realAk.split('::')[1]+']: '+type);
-  if(AZ_MODE) sbSaveAcctState(realAk);
+  // Only save template change if not 'none' to avoid overwriting real data
+  if(AZ_MODE && type !== 'none') sbSaveAcctState(realAk);
   renderRecForm();
 }
 function loadGLDump(ak){
@@ -5419,6 +5419,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
