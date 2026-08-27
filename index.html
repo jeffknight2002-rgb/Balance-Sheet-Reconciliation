@@ -824,6 +824,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -2699,74 +2700,49 @@ async function importAcctSched(ak,file){if(!file)return;let   realAk=ak.replace(
       return obj;
     });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');}
 function importSchedXlsx(inp){
-  if(!isAdm&&!isPrep){toast('Only the Preparer can import schedules','err');return;}
-  const realAk=(inp.dataset.ak||'').replace(/\x27/g,"'");
-  if(!realAk||!CURRID) return;
-  let   ast=ST_ACCT[realAk]; if(!ast) return;
-  let   def=TMPL_DEFS[ast.scheduleType]; if(!def){toast('Set a template first','err');return;}
-  const file=inp.files[0]; if(!file) return;
-  inp.value='';
-
-  let   reader=new FileReader();
+  const ak=inp.dataset.ak;
+  let   realAk=cleanKey(ak);
+  if(!ST_ACCT[realAk]) ST_ACCT[realAk]={supporting:[],scheduleType:'none',scheduleRows:[]};
+  let   ast=ST_ACCT[realAk];
+  const file=inp.files[0];
+  if(!file) return;
+  const reader=new FileReader();
   reader.onload=e2=>{
     const buf=new Uint8Array(e2.target.result);
     let   wb=XLSX.read(buf,{type:'array',cellDates:true});
-    let   ws=wb.Sheets[wb.SheetNames[0]];
-    let   rows=XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false,dateNF:'yyyy-mm-dd'});
-    if(!rows.length){toast('No data found','err');return;}
-
-    const keys=def.cols.map(c=>c.key);
-    // Auto-detect header rows: skip rows that look like headers
-    // Find the row index where first cell matches first col label
-    const colLabel0=def.cols[0]?.label?.toLowerCase()||'';
-    let headerRows=1;
-    for(let ri=0;ri<Math.min(6,rows.length);ri++){
-      const cell=String(rows[ri][0]||'').toLowerCase().trim();
-      if(cell===colLabel0||(ri>0&&cell&&cell.length<30&&!/^\d/.test(cell))){
-        headerRows=ri+1;
-      }
-    }
-    // Override: if template has groups, always 4 header rows for our standard export format
-    // Detect our standard format by checking row 0 has long title text
-    if(rows[0]&&String(rows[0][0]||'').length>30) headerRows=def.groups?4:3;
-
-    const dataRows=rows.slice(headerRows).filter(r=>
-      r.some(c=>c!==null&&c!==undefined&&String(c).trim()!=='')
-    );
-    if(!dataRows.length){toast('No data rows found — check file format','err');return;}
-
-    if(ast.scheduleRows.length&&!confirm('Replace '+ast.scheduleRows.length+' existing rows with '+dataRows.length+' imported rows?')) return;
-
-    ast.scheduleRows=dataRows.map(row=>{
+    const ws=wb.Sheets[wb.SheetNames[0]];
+    const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+    if(!raw.length){toast('Empty file','err');return;}
+    if(ast.scheduleRows.length&&!confirm('Replace '+ast.scheduleRows.length+' existing rows with imported rows?'))return;
+    // Parse rows using template column definitions
+    const tmplCols=getSchedCols(ast.scheduleType);
+    const keys=tmplCols.map(c=>c.key);
+    const headers=raw[0].map(h=>String(h).trim().toLowerCase());
+    const dataRows=raw.slice(1).filter(r=>r.some(c=>c!=='')).map(row=>{
       const obj={};
       keys.forEach((k,ci)=>{
-        const raw=row[ci];
-        if(raw===null||raw===undefined||raw==='') {obj[k]='';return;}
-        // Dates: XLSX with {raw:false,dateNF} returns strings like "2024-01-16"
-        const col=def.cols.find(c=>c.key===k);
+        const raw2=row[ci]??'';
+        const col=tmplCols[ci];
+        if(raw2===''||raw2===null||raw2===undefined){obj[k]='';return;}
         if(col?.type==='date'){
-          obj[k]=normDate(String(raw));
+          obj[k]=normDate(String(raw2));
         } else if(col?.type==='number'||col?.type==='calc'){
-          const n=parseFloat(String(raw).replace(/[,]/g,''));
+          const n=parseFloat(String(raw2).replace(/[,]/g,''));
           obj[k]=isNaN(n)?'':String(n);
         } else {
-          obj[k]=String(raw).trim();
+          obj[k]=String(raw2).trim();
         }
       });
       return obj;
     });
-
-    logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows from '+file.name);
-    // Save and lock the key so setAcctTmpl can't overwrite
-    if(AZ_MODE){
-      ST_ACCT[realAk] = ast;
-      IMPORT_LOCKED.add(realAk);
-      console.log('[importSchedXlsx] Saving+locking',realAk,'rows:',ast.scheduleRows.length);
-      sbSaveAcctState(realAk);
-      scheduleSave(CURRID);
-    }
+    // Assign rows directly — same as loadAPRef
+    ast.scheduleRows = dataRows;
+    ST_ACCT[realAk] = ast;
+    logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+dataRows.length+' rows from '+file.name);
+    // Save immediately — same pattern as loadAPRef
+    if(AZ_MODE){ IMPORT_LOCKED.add(realAk); sbSaveAcctState(realAk); scheduleSave(CURRID); }
     renderRecForm();
-    toast(ast.scheduleRows.length+' rows imported ✓','ok');
+    toast(dataRows.length+' rows imported ✓','ok');
   };
   reader.readAsArrayBuffer(file);
 }
@@ -5440,6 +5416,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
