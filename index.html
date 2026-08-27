@@ -838,6 +838,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -3322,7 +3323,9 @@ function exportRpt(){
 }
 /* ══ RECON STATUS DASHBOARD ══ */
 function renderStatusDash(){
-  const wrap=document.getElementById('statusDashWrap');
+  // Fallback if USERS not in scope
+  var _USERS = (typeof USERS !== 'undefined' && USERS) ? USERS : [{"id": 1, "name": "Jefferson Cafe", "role": "admin", "email": "jeffknight2002@gmail.com", "initials": "JC"}, {"id": 2, "name": "Tester One", "role": "preparer", "email": "tester1@gmail.com", "initials": "T1"}, {"id": 3, "name": "Tester Two", "role": "preparer", "email": "tester2@gmail.com", "initials": "T2"}, {"id": 4, "name": "Tester Three", "role": "reviewer", "email": "tester3@gmail.com", "initials": "T3"}, {"id": 5, "name": "Tester Four", "role": "reviewer", "email": "tester4@gmail.com", "initials": "T4"}, {"id": 6, "name": "Tester Five", "role": "approver", "email": "tester5@gmail.com", "initials": "T5"}];
+  var wrap=document.getElementById('statusDashWrap');
   if(!wrap)return;
 
   const RDf=CURRENT_ENTITY?RD.filter(r=>r.are===CURRENT_ENTITY):RD;
@@ -3542,7 +3545,7 @@ function renderStatusDash(){
 
   // ── Team workload ──
   const userLoad={};
-  USERS.forEach(u=>{userLoad[u.id]={u,prep:{total:0,cert:0},rev:{total:0,pending:0},app:{total:0,pending:0}};});
+  _USERS.forEach(u=>{userLoad[u.id]={u,prep:{total:0,cert:0},rev:{total:0,pending:0},app:{total:0,pending:0}};});
   RDf.forEach(r=>{
     const a=ASSIGNMENTS[r.id]||{};const s=ST[r.id].status;
     if(a.preparer&&userLoad[a.preparer]){userLoad[a.preparer].prep.total++;if(s==='certified')userLoad[a.preparer].prep.cert++;}
@@ -3661,10 +3664,10 @@ function renderStatusDash(){
     +'</div>';
 
   // Row 5: Team workload (if assigned)
-  if(USERS.length){
+  if(_USERS.length){
     html+='<div class="sd-card" style="margin-bottom:14px">'
       +'<div class="sd-head"><div class="sd-title"><i class="ti ti-users"></i>Team Workload</div>'
-      +'<span style="font-size:11px;color:var(--t3)">'+USERS.length+' team members</span></div>'
+      +'<span style="font-size:11px;color:var(--t3)">'+_USERS.length+' team members</span></div>'
       +'<div class="sd-body" style="padding:0"><table class="assignee-tbl"><thead><tr>'
       +'<th>Team Member</th><th style="text-align:center">Assigned</th><th style="text-align:center">Certified</th>'
       +'<th>Progress</th><th style="text-align:center">Pending Review</th><th style="text-align:center">Pending Approval</th>'
@@ -5442,6 +5445,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
