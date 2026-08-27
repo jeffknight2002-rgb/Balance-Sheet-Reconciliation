@@ -819,6 +819,8 @@ button{cursor:pointer}
 
 
 
+
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -1559,22 +1561,23 @@ async function sbSaveRecState(recId){
 async function sbSaveAcctState(acctKey){
   const sb = getSb(); if(!sb) return;
   const key = cleanKey(acctKey);
-  const ast = ST_ACCT[key] || ST_ACCT[acctKey];
-  console.log('[sbSaveAcctState] key:', key, 'found:', !!ast, 
-    'sup:', ast?.supporting?.length, 'rows:', ast?.scheduleRows?.length,
-    'ST_ACCT keys:', Object.keys(ST_ACCT));
-  if(!ast) return;
+  // Try all possible key variants
+  const ast = ST_ACCT[key] || ST_ACCT[acctKey] || ST_ACCT[acctKey.replace(/\x27/g,"'")] || ST_ACCT[acctKey.replace(/'/g,"\x27")];
+  if(!ast){ console.warn('[sbSaveAcctState] No data for key:', key, 'keys:', Object.keys(ST_ACCT)); return; }
+  const sup = ast.supporting||[];
+  const rows = ast.scheduleRows||[];
+  const type = ast.scheduleType||'none';
+  console.log('[sbSaveAcctState] Saving:', key, 'sup:', sup.length, 'rows:', rows.length, 'type:', type);
   try{
-    const payload = {
+    const {error} = await sb.from('acct_state').upsert({
       acct_key:      key,
-      supporting:    JSON.parse(JSON.stringify(ast.supporting||[])),
-      schedule_type: ast.scheduleType||'none',
-      schedule_rows: JSON.parse(JSON.stringify(ast.scheduleRows||[])),
+      supporting:    JSON.parse(JSON.stringify(sup)),
+      schedule_type: type,
+      schedule_rows: JSON.parse(JSON.stringify(rows)),
       updated_at:    new Date().toISOString(),
-    };
-    const {error} = await sb.from('acct_state').upsert(payload,{onConflict:'acct_key'});
+    },{onConflict:'acct_key'});
     if(error) throw error;
-    console.log('[sbSaveAcctState] OK:', key, 'sup:', payload.supporting.length, 'rows:', payload.schedule_rows.length);
+    console.log('[sbSaveAcctState] OK:', key, 'sup:', sup.length, 'rows:', rows.length);
   }catch(e){
     console.error('[sbSaveAcctState] FAIL:', key, e.message);
   }
@@ -2468,8 +2471,7 @@ function loadAPRef(ak){
   if(ST_ACCT[realAk].scheduleRows.length&&!confirm('Replace current schedule with AP reference data?'))return;
   ST_ACCT[realAk].scheduleRows=AP_REFERENCE.map(a=>({...a}));
   logAudit(CURRID,'AP reference loaded: '+AP_REFERENCE.length+' lines');
-  if(AZ_MODE) sbSaveAcctState(realAk);
-  scheduleSave(CURRID);
+  if(AZ_MODE){ ST_ACCT[realAk]=ST_ACCT[realAk]; sbSaveAcctState(realAk); scheduleSave(CURRID); }
   renderRecForm();toast('Loaded '+AP_REFERENCE.length+' AP lines','ok');
 }
 function addAcctSchedRow(ak){let   realAk=ak.replace(/\\x27/g,"'");let   ast=ST_ACCT[realAk];if(!ast)return;let   def=TMPL_DEFS[ast.scheduleType];if(!def)return;let   row={};def.cols.forEach(c=>{row[c.key]='';});ast.scheduleRows.push(row);renderRecForm();}
@@ -2751,7 +2753,9 @@ function importSchedXlsx(inp){
     logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows from '+file.name);
     // Save BEFORE renderRecForm to preserve the populated rows
     if(AZ_MODE){
-      console.log('[importSchedXlsx] Saving',realAk,'with',ast.scheduleRows.length,'rows');
+      console.log('[importSchedXlsx] About to save:',realAk,'ast rows:',ast.scheduleRows.length,'ST_ACCT same?', ST_ACCT[realAk]===ast, 'ST_ACCT rows:',ST_ACCT[realAk]?.scheduleRows?.length);
+      // Force assign back to ST_ACCT to ensure consistency
+      ST_ACCT[realAk] = ast;
       sbSaveAcctState(realAk);
       scheduleSave(CURRID);
     }
@@ -5430,6 +5434,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
