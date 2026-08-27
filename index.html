@@ -818,6 +818,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -2748,17 +2749,14 @@ function importSchedXlsx(inp){
     });
 
     logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows from '+file.name);
+    // Save BEFORE renderRecForm to preserve the populated rows
+    if(AZ_MODE){
+      console.log('[importSchedXlsx] Saving',realAk,'with',ast.scheduleRows.length,'rows');
+      sbSaveAcctState(realAk);
+      scheduleSave(CURRID);
+    }
     renderRecForm();
     toast(ast.scheduleRows.length+' rows imported ✓','ok');
-    // Save after render to ensure all rows are captured
-    if(AZ_MODE){
-      const _key=realAk; const _rowCount=ast.scheduleRows.length;
-      setTimeout(()=>{
-        console.log('[importSchedXlsx] Delayed save for',_key,'rows now:',ST_ACCT[_key]?.scheduleRows?.length);
-        scheduleSave(CURRID);
-        sbSaveAcctState(_key);
-      }, 100);
-    }
   };
   reader.readAsArrayBuffer(file);
 }
@@ -5432,6 +5430,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
