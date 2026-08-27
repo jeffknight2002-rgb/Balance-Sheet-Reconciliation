@@ -829,6 +829,10 @@ button{cursor:pointer}
 
 
 
+
+
+
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -2702,7 +2706,9 @@ async function importAcctSched(ak,file){if(!file)return;let   realAk=ak.replace(
         else obj[k]=String(raw).trim();
       });
       return obj;
-    });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');}
+    });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');
+    if(AZ_MODE){IMPORT_LOCKED.add(realAk);sbSaveAcctState(realAk);scheduleSave(CURRID);}
+    renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');}
 
 function autoCertifySingle(id){
   const locked=!!(CURRID && ST[CURRID] && ST[CURRID].status==="certified");
@@ -5276,7 +5282,9 @@ function importSchedXlsx(inp){
       ast.scheduleRows=dataRows;
       ST_ACCT[realAk]=ast;
       logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+dataRows.length+' rows from '+file.name);
+      console.log('[import] rows:',dataRows.length,'AZ_MODE:',AZ_MODE,'realAk:',realAk);
       if(AZ_MODE){IMPORT_LOCKED.add(realAk);sbSaveAcctState(realAk);scheduleSave(CURRID);}
+      else{console.warn('[import] AZ_MODE is false - not saving');}
       renderRecForm();
       toast(dataRows.length+' rows imported','ok');
     }catch(err){
@@ -5285,6 +5293,18 @@ function importSchedXlsx(inp){
     }
   };
   reader.readAsArrayBuffer(file);
+}
+
+function saveAcctNow(ak){
+  const realAk=cleanKey(ak);
+  const ast=ST_ACCT[realAk];
+  if(!ast){toast('No data to save','err');return;}
+  const rows=(ast.scheduleRows||[]).length;
+  const sup=(ast.supporting||[]).length;
+  console.log('[saveAcctNow]',realAk,'rows:',rows,'sup:',sup);
+  sbSaveAcctState(realAk).then(function(){
+    toast('Saved '+rows+' rows to Supabase','ok');
+  });
 }
 window.importSchedXlsx=importSchedXlsx;
 window.autoCertifySingle=autoCertifySingle;
@@ -5412,6 +5432,10 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
+
+
 
 
 
