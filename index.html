@@ -825,6 +825,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -2701,48 +2702,51 @@ async function importAcctSched(ak,file){if(!file)return;let   realAk=ak.replace(
     });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');}
 function importSchedXlsx(inp){
   const ak=inp.dataset.ak;
-  let   realAk=cleanKey(ak);
+  const realAk=cleanKey(ak);
   if(!ST_ACCT[realAk]) ST_ACCT[realAk]={supporting:[],scheduleType:'none',scheduleRows:[]};
-  let   ast=ST_ACCT[realAk];
   const file=inp.files[0];
   if(!file) return;
   const reader=new FileReader();
-  reader.onload=e2=>{
-    const buf=new Uint8Array(e2.target.result);
-    let   wb=XLSX.read(buf,{type:'array',cellDates:true});
-    const ws=wb.Sheets[wb.SheetNames[0]];
-    const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-    if(!raw.length){toast('Empty file','err');return;}
-    if(ast.scheduleRows.length&&!confirm('Replace '+ast.scheduleRows.length+' existing rows with imported rows?'))return;
-    // Parse rows using template column definitions
-    const tmplCols=getSchedCols(ast.scheduleType);
-    const keys=tmplCols.map(c=>c.key);
-    const headers=raw[0].map(h=>String(h).trim().toLowerCase());
-    const dataRows=raw.slice(1).filter(r=>r.some(c=>c!=='')).map(row=>{
-      const obj={};
-      keys.forEach((k,ci)=>{
-        const raw2=row[ci]??'';
-        const col=tmplCols[ci];
-        if(raw2===''||raw2===null||raw2===undefined){obj[k]='';return;}
-        if(col?.type==='date'){
-          obj[k]=normDate(String(raw2));
-        } else if(col?.type==='number'||col?.type==='calc'){
-          const n=parseFloat(String(raw2).replace(/[,]/g,''));
-          obj[k]=isNaN(n)?'':String(n);
-        } else {
-          obj[k]=String(raw2).trim();
-        }
+  reader.onload=function(e2){
+    try{
+      const buf=new Uint8Array(e2.target.result);
+      const wb=XLSX.read(buf,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
+      if(!raw||!raw.length){toast('Empty file','err');return;}
+      const ast=ST_ACCT[realAk];
+      if(!ast){toast('Account not found','err');return;}
+      if(ast.scheduleRows.length>1&&!confirm('Replace '+ast.scheduleRows.length+' existing rows?'))return;
+      const tmplCols=getSchedCols(ast.scheduleType);
+      const keys=tmplCols.map(function(c){return c.key;});
+      const dataRows=raw.slice(1).filter(function(r){return r.some(function(c){return c!=='';});}).map(function(row){
+        const obj={};
+        keys.forEach(function(k,ci){
+          const raw2=row[ci]===undefined?'':row[ci];
+          const col=tmplCols[ci];
+          if(raw2===''||raw2===null){obj[k]='';return;}
+          if(col&&col.type==='date'){obj[k]=normDate(String(raw2));}
+          else if(col&&(col.type==='number'||col.type==='calc')){const n=parseFloat(String(raw2).replace(/[,]/g,''));obj[k]=isNaN(n)?'':String(n);}
+          else{obj[k]=String(raw2).trim();}
+        });
+        return obj;
       });
-      return obj;
-    });
-    // Assign rows directly — same as loadAPRef
-    ast.scheduleRows = dataRows;
-    ST_ACCT[realAk] = ast;
-    logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+dataRows.length+' rows from '+file.name);
-    // Save immediately — same pattern as loadAPRef
-    if(AZ_MODE){ IMPORT_LOCKED.add(realAk); sbSaveAcctState(realAk); scheduleSave(CURRID); }
-    renderRecForm();
-    toast(dataRows.length+' rows imported ✓','ok');
+      // Assign directly — same as loadAPRef
+      ast.scheduleRows=dataRows;
+      ST_ACCT[realAk]=ast;
+      logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+dataRows.length+' rows from '+file.name);
+      // Save immediately — same as loadAPRef
+      if(AZ_MODE){
+        IMPORT_LOCKED.add(realAk);
+        sbSaveAcctState(realAk);
+        scheduleSave(CURRID);
+      }
+      renderRecForm();
+      toast(dataRows.length+' rows imported','ok');
+    }catch(err){
+      console.error('[importSchedXlsx] Error:',err.message);
+      toast('Import failed: '+err.message,'err');
+    }
   };
   reader.readAsArrayBuffer(file);
 }
@@ -5416,6 +5420,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
