@@ -2685,7 +2685,7 @@ async function importAcctSched(ak,file){if(!file)return;let   realAk=ak.replace(
         else obj[k]=String(raw).trim();
       });
       return obj;
-    });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');}
+    });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');if(AZ_MODE){scheduleSave(CURRID);scheduleAcctSave(realAk);}}
 function importSchedXlsx(inp){
   if(!isAdm&&!isPrep){toast('Only the Preparer can import schedules','err');return;}
   const realAk=(inp.dataset.ak||'').replace(/\x27/g,"'");
