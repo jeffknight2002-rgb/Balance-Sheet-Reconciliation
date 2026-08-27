@@ -811,6 +811,9 @@ button{cursor:pointer}
 <script>
 
 
+window.USERS=USERS;
+
+
 
 
 
@@ -3318,6 +3321,7 @@ function exportRpt(){
 }
 /* ══ RECON STATUS DASHBOARD ══ */
 function renderStatusDash(){
+  const USERS=window.USERS||[];
   const wrap=document.getElementById('statusDashWrap');
   if(!wrap)return;
 
@@ -5438,6 +5442,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
