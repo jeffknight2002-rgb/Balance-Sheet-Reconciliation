@@ -822,6 +822,8 @@ button{cursor:pointer}
 
 
 
+
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -830,6 +832,7 @@ let AZ_MODE=true;
 let UID_CTR=6;
 
 if(typeof getSb==='undefined'){window.getSb=function(){return window._sb||null;}}
+const IMPORT_LOCKED = new Set(); // keys that have real imported data
 let CURRENT_PERIOD=null;
 
 
@@ -2393,7 +2396,10 @@ function setAcctTmpl(ak,idx,type){
   let   realAk=cleanKey(ak);
   if(!ST_ACCT[realAk])ST_ACCT[realAk]={supporting:[],scheduleType:'none',scheduleRows:[]};
   let   ast=ST_ACCT[realAk];
+  // If key has imported data, don't allow template switch to clear rows unless confirmed
+  if(IMPORT_LOCKED.has(realAk) && ast.scheduleType===type) return; // same template, no-op
   if(ast.scheduleType!==type&&ast.scheduleRows.length>0&&!confirm('Switch template? Existing schedule rows will be cleared.'))return;
+  if(type==='none') IMPORT_LOCKED.delete(realAk); // unlock if clearing
   ast.scheduleType=type;
   if(type==='none'){ast.scheduleRows=[];}
   else{
@@ -2424,12 +2430,7 @@ function setAcctTmpl(ak,idx,type){
     else if(!ast.scheduleRows.length){let   def=TMPL_DEFS[type];if(def){let   row={};def.cols.forEach(c=>{row[c.key]='';});ast.scheduleRows.push(row);}}
   }
   logAudit(CURRID,'Schedule template set ['+realAk.split('::')[1]+']: '+type);
-  // Only save if template is set and no real data exists yet (don't overwrite imports)
-  if(AZ_MODE && type !== 'none'){
-    const _rows = (ST_ACCT[realAk]?.scheduleRows||[]).length;
-    if(_rows <= 1) sbSaveAcctState(realAk); // only save default/empty template
-    else console.log('[setAcctTmpl] Skipping save - import data exists:', _rows, 'rows');
-  }
+  // Don't save here — save happens after import/addSI
   renderRecForm();
 }
 function loadGLDump(ak){
@@ -2476,7 +2477,7 @@ function loadAPRef(ak){
   if(ST_ACCT[realAk].scheduleRows.length&&!confirm('Replace current schedule with AP reference data?'))return;
   ST_ACCT[realAk].scheduleRows=AP_REFERENCE.map(a=>({...a}));
   logAudit(CURRID,'AP reference loaded: '+AP_REFERENCE.length+' lines');
-  if(AZ_MODE){ ST_ACCT[realAk]=ST_ACCT[realAk]; sbSaveAcctState(realAk); scheduleSave(CURRID); }
+  if(AZ_MODE){ IMPORT_LOCKED.add(realAk); sbSaveAcctState(realAk); scheduleSave(CURRID); }
   renderRecForm();toast('Loaded '+AP_REFERENCE.length+' AP lines','ok');
 }
 function addAcctSchedRow(ak){let   realAk=ak.replace(/\\x27/g,"'");let   ast=ST_ACCT[realAk];if(!ast)return;let   def=TMPL_DEFS[ast.scheduleType];if(!def)return;let   row={};def.cols.forEach(c=>{row[c.key]='';});ast.scheduleRows.push(row);renderRecForm();}
@@ -2756,11 +2757,11 @@ function importSchedXlsx(inp){
     });
 
     logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows from '+file.name);
-    // Save BEFORE renderRecForm to preserve the populated rows
+    // Save and lock the key so setAcctTmpl can't overwrite
     if(AZ_MODE){
-      console.log('[importSchedXlsx] About to save:',realAk,'ast rows:',ast.scheduleRows.length,'ST_ACCT same?', ST_ACCT[realAk]===ast, 'ST_ACCT rows:',ST_ACCT[realAk]?.scheduleRows?.length);
-      // Force assign back to ST_ACCT to ensure consistency
       ST_ACCT[realAk] = ast;
+      IMPORT_LOCKED.add(realAk);
+      console.log('[importSchedXlsx] Saving+locking',realAk,'rows:',ast.scheduleRows.length);
       sbSaveAcctState(realAk);
       scheduleSave(CURRID);
     }
@@ -5439,6 +5440,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
