@@ -816,6 +816,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -1557,18 +1558,21 @@ async function sbSaveAcctState(acctKey){
   const sb = getSb(); if(!sb) return;
   const key = cleanKey(acctKey);
   const ast = ST_ACCT[key] || ST_ACCT[acctKey];
+  console.log('[sbSaveAcctState] key:', key, 'found:', !!ast, 
+    'sup:', ast?.supporting?.length, 'rows:', ast?.scheduleRows?.length,
+    'ST_ACCT keys:', Object.keys(ST_ACCT));
   if(!ast) return;
-  // Always save — caller is responsible for not calling with empty data
   try{
-    const {error} = await sb.from('acct_state').upsert({
+    const payload = {
       acct_key:      key,
-      supporting:    ast.supporting||[],
+      supporting:    JSON.parse(JSON.stringify(ast.supporting||[])),
       schedule_type: ast.scheduleType||'none',
-      schedule_rows: ast.scheduleRows||[],
+      schedule_rows: JSON.parse(JSON.stringify(ast.scheduleRows||[])),
       updated_at:    new Date().toISOString(),
-    },{onConflict:'acct_key'});
+    };
+    const {error} = await sb.from('acct_state').upsert(payload,{onConflict:'acct_key'});
     if(error) throw error;
-    console.log('[sbSaveAcctState] OK:', key, 'rows:', (ast.scheduleRows||[]).length);
+    console.log('[sbSaveAcctState] OK:', key, 'sup:', payload.supporting.length, 'rows:', payload.schedule_rows.length);
   }catch(e){
     console.error('[sbSaveAcctState] FAIL:', key, e.message);
   }
@@ -5419,6 +5423,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
