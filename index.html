@@ -833,6 +833,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -1918,7 +1919,12 @@ function goPage(p,el){
   }
   if(p==='autocert')renderAutoCertPage();
   if(p==='matching'){initMatchPage();}
-  if(p==='status')renderStatusDash();
+  if(p==='status'){
+    sbLoadAll().then(function(){
+      renderStatusDash();
+      renderKpis();
+    });
+  }
 }
 async function openRec(id){
   const realId=(id||'').replace(/\x27/g,"'");
@@ -5432,6 +5438,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
