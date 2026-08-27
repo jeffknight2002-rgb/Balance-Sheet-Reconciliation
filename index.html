@@ -809,6 +809,9 @@ button{cursor:pointer}
 
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 <script>
+var USERS=[]; // will be overwritten by declaration below
+
+
 
 
 
@@ -3323,6 +3326,9 @@ function exportRpt(){
 }
 /* ══ RECON STATUS DASHBOARD ══ */
 function renderStatusDash(){
+  var USERS = (typeof window.USERS!=='undefined'&&window.USERS) ? window.USERS : 
+              (typeof USERS!=='undefined'&&USERS) ? USERS : [];
+  if(!Array.isArray(USERS)) USERS = [];
   const wrap=document.getElementById('statusDashWrap');
   if(!wrap)return;
 
@@ -5444,6 +5450,8 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
 
 
 
