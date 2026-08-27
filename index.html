@@ -814,6 +814,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -2358,7 +2359,7 @@ function buildSchedHTML(ast,r,locked,ek,acctIdx){
   return'<div style="margin-top:6px"><div style="display:flex;align-items:center;gap:7px;margin-bottom:5px;flex-wrap:wrap"><span style="font-size:11.5px;font-weight:600;color:var(--t1)">'+def.label+'</span><span style="font-size:11px;color:var(--t3)">('+rows.length+' lines)</span>'+apBtn+'<button class="btn btn-sm" style="margin-left:auto" data-ak="'+ek+'" onclick="exportAcctSched(this.dataset.ak)"><i class="ti ti-download"></i>Export</button><button class="btn btn-sm" onclick="document.getElementById(\'schin_'+acctIdx+'\').click()"><i class="ti ti-upload"></i>Import</button><input type="file" id="schin_'+acctIdx+'" accept=".xlsx,.csv" style="display:none" data-ak="'+ek+'" onchange="importAcctSched(this.dataset.ak,this.files[0]);this.value=\'\'"/></div><div class="sched-wrap"><table class="sched-tbl"><thead>'+thead+'</thead><tbody>'+tbody+'</tbody><tfoot><tr><td colspan="'+(def.cols.length-1)+'" style="padding:6px 10px"><strong>Total — '+def.label+'</strong></td><td class="r mn" style="padding:6px 10px;color:'+fmtC(tot)+';font-weight:700">'+fvb(tot)+'</td><td></td></tr></tfoot></table></div>'+(locked?'':'<div class="sched-add"><button class="btn btn-navy btn-sm" data-ak="'+ek+'" onclick="addAcctSchedRow(this.dataset.ak)"><i class="ti ti-row-insert-bottom"></i>Add Row</button></div>')+'</div>';
 }
 function addAcctSI(ak,idx){
-  let   realAk=ak.replace(/\\x27/g,"'");
+  let   realAk=cleanKey(ak);
   let   desc=(document.getElementById('asi_desc_'+idx)||{}).value?.trim();
   let   type=(document.getElementById('asi_type_'+idx)||{}).value;
   let   amt=parseFloat((document.getElementById('asi_amt_'+idx)||{}).value||0);
@@ -2380,7 +2381,7 @@ function removeAcctSI(ak,i){
   renderRecForm();renderDash();toast('Item removed');
 }
 function setAcctTmpl(ak,idx,type){
-  let   realAk=ak.replace(/\\x27/g,"'");
+  let   realAk=cleanKey(ak);
   if(!ST_ACCT[realAk])ST_ACCT[realAk]={supporting:[],scheduleType:'none',scheduleRows:[]};
   let   ast=ST_ACCT[realAk];
   if(ast.scheduleType!==type&&ast.scheduleRows.length>0&&!confirm('Switch template? Existing schedule rows will be cleared.'))return;
@@ -2456,7 +2457,7 @@ function loadGLDump(ak){
 }
 
 function loadAPRef(ak){
-  let   realAk=ak.replace(/\\x27/g,"'");
+  let   realAk=cleanKey(ak);
   if(!ST_ACCT[realAk])return;
   if(ST_ACCT[realAk].scheduleRows.length&&!confirm('Replace current schedule with AP reference data?'))return;
   ST_ACCT[realAk].scheduleRows=AP_REFERENCE.map(a=>({...a}));
@@ -5418,6 +5419,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
