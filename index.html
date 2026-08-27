@@ -811,6 +811,7 @@ button{cursor:pointer}
 <script>
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -1011,23 +1012,11 @@ async function azLoadUsers(){
 }
 
 function scheduleSave(recId){
-  setSaveIndicator(recId,'saving');
-  clearTimeout(AZ_SAVE_TIMERS[recId]);
-  AZ_SAVE_TIMERS[recId] = setTimeout(async ()=>{
-    if(AZ_MODE) azSaveRecState(recId);
-    // Auto-save to SharePoint shared state
-    if(SP_STATE_CONFIG.autoSave && SP_STATE_CONFIG.filePath){
-      await spSaveSharedState(true);
-      setSaveIndicator(recId,'saved');
-    }
-  }, 2000);
+  if(AZ_MODE) sbSaveRecState(recId);
 }
 
 function scheduleAcctSave(acctKey){
-  clearTimeout(AZ_SAVE_TIMERS['acct_'+acctKey]);
-  AZ_SAVE_TIMERS['acct_'+acctKey] = setTimeout(()=>{
-    if(AZ_MODE) azSaveAcctState(acctKey);
-  }, 2000);
+  if(AZ_MODE) sbSaveAcctState(acctKey);
 }
 
 function setSaveIndicator(recId, state){
@@ -2685,7 +2674,7 @@ async function importAcctSched(ak,file){if(!file)return;let   realAk=ak.replace(
         else obj[k]=String(raw).trim();
       });
       return obj;
-    });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');if(AZ_MODE){scheduleSave(CURRID);scheduleAcctSave(realAk);}}
+    });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');}
 function importSchedXlsx(inp){
   if(!isAdm&&!isPrep){toast('Only the Preparer can import schedules','err');return;}
   const realAk=(inp.dataset.ak||'').replace(/\x27/g,"'");
@@ -5421,6 +5410,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
