@@ -826,6 +826,9 @@ button{cursor:pointer}
 
 
 
+
+
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -2700,56 +2703,7 @@ async function importAcctSched(ak,file){if(!file)return;let   realAk=ak.replace(
       });
       return obj;
     });logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+ast.scheduleRows.length+' rows');renderRecForm();toast(ast.scheduleRows.length+' rows imported','ok');}
-function importSchedXlsx(inp){
-  const ak=inp.dataset.ak;
-  const realAk=cleanKey(ak);
-  if(!ST_ACCT[realAk]) ST_ACCT[realAk]={supporting:[],scheduleType:'none',scheduleRows:[]};
-  const file=inp.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=function(e2){
-    try{
-      const buf=new Uint8Array(e2.target.result);
-      const wb=XLSX.read(buf,{type:'array',cellDates:true});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const raw=XLSX.utils.sheet_to_json(ws,{header:1,defval:''});
-      if(!raw||!raw.length){toast('Empty file','err');return;}
-      const ast=ST_ACCT[realAk];
-      if(!ast){toast('Account not found','err');return;}
-      if(ast.scheduleRows.length>1&&!confirm('Replace '+ast.scheduleRows.length+' existing rows?'))return;
-      const tmplCols=getSchedCols(ast.scheduleType);
-      const keys=tmplCols.map(function(c){return c.key;});
-      const dataRows=raw.slice(1).filter(function(r){return r.some(function(c){return c!=='';});}).map(function(row){
-        const obj={};
-        keys.forEach(function(k,ci){
-          const raw2=row[ci]===undefined?'':row[ci];
-          const col=tmplCols[ci];
-          if(raw2===''||raw2===null){obj[k]='';return;}
-          if(col&&col.type==='date'){obj[k]=normDate(String(raw2));}
-          else if(col&&(col.type==='number'||col.type==='calc')){const n=parseFloat(String(raw2).replace(/[,]/g,''));obj[k]=isNaN(n)?'':String(n);}
-          else{obj[k]=String(raw2).trim();}
-        });
-        return obj;
-      });
-      // Assign directly — same as loadAPRef
-      ast.scheduleRows=dataRows;
-      ST_ACCT[realAk]=ast;
-      logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+dataRows.length+' rows from '+file.name);
-      // Save immediately — same as loadAPRef
-      if(AZ_MODE){
-        IMPORT_LOCKED.add(realAk);
-        sbSaveAcctState(realAk);
-        scheduleSave(CURRID);
-      }
-      renderRecForm();
-      toast(dataRows.length+' rows imported','ok');
-    }catch(err){
-      console.error('[importSchedXlsx] Error:',err.message);
-      toast('Import failed: '+err.message,'err');
-    }
-  };
-  reader.readAsArrayBuffer(file);
-}
+
 function autoCertifySingle(id){
   const locked=!!(CURRID && ST[CURRID] && ST[CURRID].status==="certified");
   let   realId = id.replace(/\x27/g,"'");
@@ -5294,6 +5248,44 @@ window.editNumCell=editNumCell;
 window.finishNumCell=finishNumCell;
 window.updateAcctCell=updateAcctCell;
 window.exportAcctSched=exportAcctSched;
+
+function importSchedXlsx(inp){
+  const ak=inp.dataset.ak;
+  const realAk=cleanKey(ak);
+  if(!ST_ACCT[realAk]) ST_ACCT[realAk]={supporting:[],scheduleType:'none',scheduleRows:[]};
+  const file=inp.files[0];
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=function(e2){
+    try{
+      const buf=new Uint8Array(e2.target.result);
+      const wb=XLSX.read(buf,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      // Use raw header row from Excel — don't depend on getSchedCols
+      const raw=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!raw||!raw.length){toast('Empty file','err');return;}
+      const ast=ST_ACCT[realAk];
+      if(!ast){toast('Account not found','err');return;}
+      if(ast.scheduleRows.length>1&&!confirm('Replace '+ast.scheduleRows.length+' existing rows?'))return;
+      // Store rows with original Excel column names
+      const dataRows=raw.map(function(row){
+        const obj={};
+        Object.keys(row).forEach(function(k){ obj[k]=row[k]===null||row[k]===undefined?'':String(row[k]); });
+        return obj;
+      });
+      ast.scheduleRows=dataRows;
+      ST_ACCT[realAk]=ast;
+      logAudit(CURRID,'Schedule imported for '+realAk.split('::')[1]+': '+dataRows.length+' rows from '+file.name);
+      if(AZ_MODE){IMPORT_LOCKED.add(realAk);sbSaveAcctState(realAk);scheduleSave(CURRID);}
+      renderRecForm();
+      toast(dataRows.length+' rows imported','ok');
+    }catch(err){
+      console.error('[importSchedXlsx] Error:',err.message);
+      toast('Import failed: '+err.message,'err');
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
 window.importSchedXlsx=importSchedXlsx;
 window.autoCertifySingle=autoCertifySingle;
 window.returnRec=returnRec;
@@ -5420,6 +5412,9 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
+
+
 
 
 
