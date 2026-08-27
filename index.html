@@ -809,6 +809,7 @@ button{cursor:pointer}
 
 <div class="toast" id="toast"><i class="ti ti-circle-check" id="toastIcon"></i><span id="toastMsg"></span></div>
 <script>
+
 var USERS=[]; // will be overwritten by declaration below
 
 
@@ -3326,360 +3327,33 @@ function exportRpt(){
 }
 /* ══ RECON STATUS DASHBOARD ══ */
 function renderStatusDash(){
-  var USERS = (typeof window.USERS!=='undefined'&&window.USERS) ? window.USERS : 
-              (typeof USERS!=='undefined'&&USERS) ? USERS : [];
-  if(!Array.isArray(USERS)) USERS = [];
   const wrap=document.getElementById('statusDashWrap');
-  if(!wrap)return;
-
+  if(!wrap) return;
   const RDf=CURRENT_ENTITY?RD.filter(r=>r.are===CURRENT_ENTITY):RD;
-  let   total=RDf.length;
-  if(total===0){wrap.innerHTML='<div style="padding:40px;text-align:center;color:var(--t3)">No reconciliations for selected entity</div>';return;}
+  const total=RDf.length;
+  if(total===0){wrap.innerHTML='<div style="padding:40px;text-align:center;color:var(--t3)">No reconciliations</div>';return;}
   const byStatus={open:0,in_progress:0,in_review:0,reviewed:0,certified:0,returned:0};
-  RDf.forEach(r=>{const s=ST[r.id].status;if(byStatus[s]!==undefined)byStatus[s]++;});
-
-  let   cert=byStatus.certified||0;
-  let   inProg=(byStatus.in_progress||0)+(byStatus.in_review||0)+(byStatus.reviewed||0)+(byStatus.returned||0);
-  const notStarted=byStatus.open||0;
-  const pctCert=total?Math.round(cert/total*100):0;
-
-  const SC={open:'#F59E0B',in_progress:'#3B82F6',in_review:'#8B5CF6',reviewed:'#EC4899',certified:'#10B981',returned:'#EF4444'};
-  const SL={open:'Not Started',in_progress:'In Progress',in_review:'In Review',reviewed:'Pending Approval',certified:'Certified',returned:'Returned'};
-
-  // ── Donut SVG (pure string, no template literal) ──
-  const W=130,R=48,cx=65,cy=65,sw=15;
-  const circ=2*Math.PI*R;
-  let paths='',offset=0;
-  Object.entries(byStatus).filter(([,v])=>v>0).forEach(([k,v])=>{
-    let   pct=v/total;
-    const dash=(circ*pct).toFixed(2);
-    const gap=(circ-circ*pct).toFixed(2);
-    const rot=(circ*0.25-offset*circ).toFixed(2);
-    paths+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none"'
-      +' stroke="'+(SC[k]||'#94A3B8')+'" stroke-width="'+sw+'"'
-      +' stroke-dasharray="'+dash+' '+gap+'"'
-      +' stroke-dashoffset="'+rot+'"'
-      +' style="cursor:pointer" onclick="filterByStatus(\''+k+'\')" />';
-    offset+=pct;
-  });
-  const donutSVG='<svg width="'+W+'" height="'+W+'" viewBox="0 0 '+W+' '+W+'" style="transform:rotate(-90deg)">'
-    +'<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="var(--b1)" stroke-width="'+sw+'"/>'
-    +paths+'</svg>';
-
-  // ── Legend items ──
-  let legend='';
-  Object.entries(byStatus).forEach(([k,v])=>{
-    legend+='<div class="rl-item" onclick="filterByStatus(\''+k+'\')">'+
-      '<div class="rl-dot" style="background:'+SC[k]+'"></div>'+
-      '<div class="rl-label">'+SL[k]+'</div>'+
-      '<div class="rl-count">'+v+'</div>'+
-      '<div class="rl-pct">'+(total?Math.round(v/total*100):0)+'%</div>'+
-      '</div>';
-  });
-
-  // ── Risk stats ──
-  const risks=[
-    {key:'1. Most Critical',label:'Most Critical',color:'var(--red)',   bg:'var(--red2)',  bd:'var(--red3)'},
-    {key:'2. ICFR Relevant', label:'ICFR Relevant',color:'var(--amber)',bg:'var(--amber2)',bd:'var(--amber3)'},
-    {key:'3. Others',        label:'Others',       color:'var(--green)',bg:'var(--green2)',bd:'var(--green3)'},
-  ];
-  const riskStats={};
-  risks.forEach(rc=>{riskStats[rc.key]={total:0,cert:0,inProg:0,open:0,diff:0};});
+  RDf.forEach(r=>{const s=ST[r.id]?.status||'open';if(byStatus[s]!==undefined)byStatus[s]++;else byStatus.open++;});
+  const cert=byStatus.certified||0;
+  const pct=total?Math.round(cert/total*100):0;
+  let html='<div style="padding:20px">';
+  html+='<h3 style="margin:0 0 16px;font-size:16px;font-weight:700">Reconciliation Status Dashboard</h3>';
+  html+='<div style="margin-bottom:16px"><div style="font-size:13px;color:var(--t2);margin-bottom:6px">Overall Completion — Jun 2026 &nbsp; <strong>'+pct+'%</strong></div>';
+  html+='<div style="background:var(--b1);border-radius:4px;height:8px"><div style="background:var(--green);width:'+pct+'%;height:8px;border-radius:4px"></div></div>';
+  html+='<div style="font-size:12px;color:var(--t3);margin-top:6px">'+cert+' certified &bull; '+(byStatus.in_progress||0)+' in progress &bull; '+(byStatus.open||0)+' not started</div></div>';
+  html+='<table style="width:100%;border-collapse:collapse;font-size:13px">';
+  html+='<tr style="background:var(--b1)"><th style="padding:8px;text-align:left">FSLI</th><th style="padding:8px;text-align:center">Status</th><th style="padding:8px;text-align:right">GL Closing</th></tr>';
   RDf.forEach(r=>{
-    const g=riskStats[r.risk];if(!g)return;
-    g.total++;
-    const s=ST[r.id].status;
-    if(s==='certified')g.cert++;
-    else if(s==='open')g.open++;
-    else g.inProg++;
-    if(Math.abs(getAcctTotals(r.id,r).diff)>=0.01)g.diff++;
+    const st=ST[r.id]?.status||'open';
+    const colors={open:'var(--t3)',in_progress:'var(--blue)',in_review:'var(--orange)',reviewed:'var(--purple)',certified:'var(--green)',returned:'var(--red)'};
+    const labels={open:'Open',in_progress:'In Progress',in_review:'In Review',reviewed:'Reviewed',certified:'Certified',returned:'Returned'};
+    html+='<tr style="border-bottom:1px solid var(--b1)">';
+    html+='<td style="padding:8px">'+r.fsli+'</td>';
+    html+='<td style="padding:8px;text-align:center"><span style="color:'+(colors[st]||'var(--t3)')+'">'+( labels[st]||st)+'</span></td>';
+    html+='<td style="padding:8px;text-align:right;font-family:monospace">'+fv(r.gl)+'</td>';
+    html+='</tr>';
   });
-  let riskCards='';
-  risks.forEach(rc=>{
-    const g=riskStats[rc.key];
-    let   pct=g.total?Math.round(g.cert/g.total*100):0;
-    riskCards+='<div class="sd-card"><div style="padding:14px 15px;border-left:4px solid '+rc.color+'">'
-      +'<div style="font-size:10px;font-weight:700;color:'+rc.color+';text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+rc.label+'</div>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
-      +'<div style="text-align:center;padding:8px;background:'+rc.bg+';border:1px solid '+rc.bd+';border-radius:var(--r)">'
-      +'<div style="font-size:22px;font-weight:700;color:'+rc.color+';font-family:var(--mono)">'+g.total+'</div>'
-      +'<div style="font-size:10px;color:'+rc.color+'">Total</div></div>'
-      +'<div style="text-align:center;padding:8px;background:var(--green2);border:1px solid var(--green3);border-radius:var(--r)">'
-      +'<div style="font-size:22px;font-weight:700;color:var(--green);font-family:var(--mono)">'+pct+'%</div>'
-      +'<div style="font-size:10px;color:var(--green)">Certified</div></div>'
-      +'</div>'
-      +'<div class="pb2"><div class="pb2-fill" style="width:'+pct+'%;background:var(--green)"></div></div>'
-      +'<div style="display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--t3)">'
-      +'<span style="color:var(--green)">✓ '+g.cert+' certified</span>'
-      +'<span style="color:var(--blue)">'+g.inProg+' in progress</span>'
-      +'<span style="color:var(--amber)">'+g.open+' open</span>'
-      +(g.diff?'<span style="color:var(--red)">'+fvb(g.diff)+' w/diff</span>':'')
-      +'</div></div></div>';
-  });
-
-  // ── FSLI Progress ──
-  const fsliGroups={};
-  RDf.forEach(r=>{
-    if(!fsliGroups[r.fsli])fsliGroups[r.fsli]={total:0,cert:0,inProg:0,diff:0};
-    const g=fsliGroups[r.fsli];g.total++;
-    const s=ST[r.id].status;
-    if(s==='certified')g.cert++;else if(s!=='open')g.inProg++;
-    if(Math.abs(getAcctTotals(r.id,r).diff)>=0.01)g.diff++;
-  });
-  let fsliRows='';
-  Object.entries(fsliGroups).sort((a,b)=>b[1].total-a[1].total).forEach(([fsli,g])=>{
-    let   pct=Math.round(g.cert/g.total*100);
-    const progPct=Math.round((g.cert+g.inProg)/g.total*100);
-    fsliRows+='<div class="prog-row">'
-      +'<div class="prog-label" title="'+fsli+'">'+fsli+'</div>'
-      +'<div class="prog-bar-wrap"><div class="pb2">'
-      +'<div style="height:100%;border-radius:4px;background:linear-gradient(90deg,var(--green) '+pct+'%,var(--blue) '+pct+'%);width:'+progPct+'%"></div>'
-      +'</div></div>'
-      +'<div class="prog-counts">'+g.cert+'/'+g.total
-      +(g.diff?' <span style="color:var(--red);font-size:10.5px">('+fvb(g.diff)+' diff)</span>':'')
-      +'</div></div>';
-  });
-
-  // ── ARE Progress (top 12) ──
-  const areGroups={};
-  RDf.forEach(r=>{
-    if(!areGroups[r.are])areGroups[r.are]={total:0,cert:0,ccy:r.ccy};
-    areGroups[r.are].total++;
-    if(ST[r.id].status==='certified')areGroups[r.are].cert++;
-  });
-  let areRows='';
-  Object.entries(areGroups).sort((a,b)=>b[1].total-a[1].total).slice(0,12).forEach(([are,g])=>{
-    let   pct=Math.round(g.cert/g.total*100);
-    const barColor=pct===100?'var(--green)':pct>50?'var(--blue)':'var(--amber)';
-    areRows+='<div class="prog-row">'
-      +'<div style="font-size:12px;font-weight:600;width:52px;flex-shrink:0;color:var(--navy)">'+are+'</div>'
-      +'<div style="font-size:10.5px;color:var(--t3);width:36px;flex-shrink:0">'+g.ccy+'</div>'
-      +'<div class="prog-bar-wrap" style="flex:1"><div class="pb2">'
-      +'<div class="pb2-fill" style="width:'+pct+'%;background:'+barColor+'"></div>'
-      +'</div></div>'
-      +'<div class="prog-counts">'+g.cert+'/'+g.total+' · '+pct+'%</div>'
-      +'</div>';
-  });
-
-  // ── Open item aging ──
-  const agingB=[
-    {label:'Current (0-30d)', color:'var(--green)', cls:'age-1', min:0,  max:30,  ct:0, amt:0},
-    {label:'31-60 days',      color:'#92400E',      cls:'age-2', min:31, max:60,  ct:0, amt:0},
-    {label:'61-90 days',      color:'var(--amber)', cls:'age-3', min:61, max:90,  ct:0, amt:0},
-    {label:'91-180 days',     color:'#991B1B',      cls:'age-4', min:91, max:180, ct:0, amt:0},
-    {label:'>180 days',       color:'var(--red)',   cls:'age-5', min:181,max:9999,ct:0, amt:0},
-  ];
-  const RDe2=CURRENT_ENTITY?RDf:RD;
-  Object.values(ST).forEach((st,idx2)=>{
-    st.openItems.forEach(oi=>{
-      const d=ageDays(oi.date);
-      const b=agingB.find(x=>d>=x.min&&d<=x.max)||agingB[agingB.length-1];
-      b.ct++;b.amt+=oi.amt;
-    });
-  });
-  const maxOI=Math.max(1,...agingB.map(b=>b.ct));
-  let agingBars='';
-  agingBars+='<div style="font-size:10.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Open Reconciling Items — Aging from Period End (30 Jun 2026)</div>';
-  agingB.forEach(b=>{
-    agingBars+='<div class="aging-bar-row">'
-      +'<div class="aging-label" style="width:100px">'+b.label+'</div>'
-      +'<div class="aging-bar-track">'
-      +'<div class="aging-bar-fill" style="width:'+Math.round(b.ct/maxOI*100)+'%;background:'+b.color+'">'+(b.ct>0?b.ct:'')+'</div>'
-      +'</div>'
-      +'<div class="aging-ct">'+b.ct+'</div>'
-      +'<div style="font-size:11px;color:var(--t3);min-width:100px;text-align:right">'+(b.amt?fv(b.amt):'')+'</div>'
-      +'</div>';
-  });
-  // Overdue reconciliations section
-  const overdueRecs=RDf.filter(r=>isOverdue(r));
-  agingBars+='<div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--b1)">'
-    +'<div style="font-size:10.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Overdue Reconciliations (Past ARD)</div>'
-    +'<div style="display:flex;gap:12px;flex-wrap:wrap">'
-    +['0-7d','8-14d','15-30d','>30d'].map((lbl,i)=>{
-        const ranges=[[0,7],[8,14],[15,30],[31,9999]];
-        const [mn,mx]=ranges[i];
-        let   ct=overdueRecs.filter(r=>{const d=overdueDays(r);return d>=mn&&d<=mx;}).length;
-        const clr=i===0?'var(--amber)':i===1?'#B45309':i===2?'var(--red)':'#7F1D1D';
-        return'<div style="text-align:center;padding:8px 14px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r)">'
-          +'<div style="font-size:18px;font-weight:700;color:'+clr+';font-family:var(--mono)">'+ct+'</div>'
-          +'<div style="font-size:10.5px;color:var(--t3)">'+lbl+'</div>'
-          +'</div>';
-      }).join('')
-    +'</div></div>';
-
-  // OI by FSLI
-  const oiByFsli={};
-  RDf.forEach(r=>{if(ST[r.id].openItems.length){if(!oiByFsli[r.fsli])oiByFsli[r.fsli]=0;oiByFsli[r.fsli]+=ST[r.id].openItems.length;}});
-  let oiFsliRows='';
-  Object.entries(oiByFsli).sort((a,b)=>b[1]-a[1]).slice(0,6).forEach(([f,ct])=>{
-    oiFsliRows+='<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--b1);font-size:12px">'
-      +'<span style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t2)">'+f+'</span>'
-      +'<span style="font-weight:700;color:var(--red)">'+ct+'</span>'
-      +'</div>';
-  });
-  if(!oiFsliRows)oiFsliRows='<div style="color:var(--t3);font-size:12px;padding:8px 0">No open items</div>';
-
-  // ── Top unidentified differences ──
-  const topDiff=RDf.filter(r=>ST[r.id].status!=='certified')
-    .map(r=>({r,tots:getAcctTotals(r.id,r)}))
-    .filter(x=>Math.abs(x.tots.diff)>=0.01)
-    .sort((a,b)=>Math.abs(b.tots.diff)-Math.abs(a.tots.diff)).slice(0,8);
-  let topDiffRows='';
-  topDiff.forEach(({r,tots})=>{
-    const eid=edata(r.id);
-    topDiffRows+='<tr style="border-bottom:1px solid var(--b1);cursor:pointer" data-id="'+eid+'" onclick="openRec(this.dataset.id)">'
-      +'<td style="padding:7px 10px;font-size:12px;font-weight:500;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+r.fsli+'</td>'
-      +'<td style="padding:7px 10px;font-size:12px;font-weight:600">'+r.are+'</td>'
-      +'<td style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:12px;color:'+fmtC(r.gl)+'">'+fv(r.gl)+'</td>'
-      +'<td style="padding:7px 10px;text-align:right;font-family:var(--mono);font-size:12px;color:var(--red);font-weight:700">'+fvd(tots.diff)+'</td>'
-      +'<td style="padding:7px 10px"><span class="badge '+sbCls(ST[r.id].status)+'">'+sbLabel(ST[r.id].status)+'</span></td>'
-      +'<td style="padding:7px 10px;text-align:right"><button class="btn btn-sm" data-id="'+eid+'" onclick="event.stopPropagation();openRec(this.dataset.id)"><i class="ti ti-arrow-right"></i></button></td>'
-      +'</tr>';
-  });
-  const topDiffTable=topDiff.length
-    ?'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
-      +'<th style="padding:6px 10px;background:var(--bg);border-bottom:2px solid var(--b1);text-align:left;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase">FSLI</th>'
-      +'<th style="padding:6px 10px;background:var(--bg);border-bottom:2px solid var(--b1);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase">ARE</th>'
-      +'<th style="padding:6px 10px;background:var(--bg);border-bottom:2px solid var(--b1);text-align:right;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase">GL Balance</th>'
-      +'<th style="padding:6px 10px;background:var(--bg);border-bottom:2px solid var(--b1);text-align:right;font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase">Difference</th>'
-      +'<th style="padding:6px 10px;background:var(--bg);border-bottom:2px solid var(--b1);font-size:10px;font-weight:700;color:var(--t3);text-transform:uppercase">Status</th>'
-      +'<th style="padding:6px 10px;background:var(--bg);border-bottom:2px solid var(--b1);width:36px"></th>'
-      +'</tr></thead><tbody>'+topDiffRows+'</tbody></table>'
-    :'<div style="padding:24px;text-align:center;color:var(--green);font-size:12px"><i class="ti ti-circle-check" style="font-size:24px;display:block;margin-bottom:6px"></i>No unidentified differences</div>';
-
-  // ── Team workload ──
-  const userLoad={};
-  USERS.forEach(u=>{userLoad[u.id]={u,prep:{total:0,cert:0},rev:{total:0,pending:0},app:{total:0,pending:0}};});
-  RDf.forEach(r=>{
-    const a=ASSIGNMENTS[r.id]||{};const s=ST[r.id].status;
-    if(a.preparer&&userLoad[a.preparer]){userLoad[a.preparer].prep.total++;if(s==='certified')userLoad[a.preparer].prep.cert++;}
-    if(a.reviewer&&userLoad[a.reviewer]){userLoad[a.reviewer].rev.total++;if(s==='in_review')userLoad[a.reviewer].rev.pending++;}
-    if(a.approver&&userLoad[a.approver]){userLoad[a.approver].app.total++;if(s==='reviewed')userLoad[a.approver].app.pending++;}
-  });
-  let userRows='';
-  Object.values(userLoad).filter(u=>u.prep.total+u.rev.total+u.app.total>0).forEach(({u,prep,rev,app})=>{
-    let   rc={preparer:'var(--blue)',reviewer:'var(--green)',approver:'var(--purple)'}[u.role]||'var(--t3)';
-    let   pct=prep.total?Math.round(prep.cert/prep.total*100):0;
-    userRows+='<tr>'
-      +'<td style="padding:7px 10px"><div style="display:flex;align-items:center;gap:7px">'
-      +'<div style="width:26px;height:26px;border-radius:50%;background:'+rc+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0">'+u.initials+'</div>'
-      +'<div><div style="font-size:12.5px;font-weight:500">'+u.name+'</div><div style="font-size:10.5px;color:var(--t3)">'+u.role+'</div></div>'
-      +'</div></td>'
-      +'<td style="padding:7px 10px;text-align:center;font-size:12px">'+(prep.total||'—')+'</td>'
-      +'<td style="padding:7px 10px;text-align:center;font-size:12px;color:var(--green);font-weight:600">'+(prep.cert||'—')+'</td>'
-      +'<td style="padding:7px 10px"><div class="pb2" style="min-width:60px"><div class="pb2-fill" style="width:'+pct+'%;background:'+rc+'"></div></div></td>'
-      +'<td style="padding:7px 10px;text-align:center;font-size:12px;color:'+(rev.pending?'var(--amber)':'var(--t3)')+';font-weight:'+(rev.pending?700:400)+'">'+(rev.pending||'—')+'</td>'
-      +'<td style="padding:7px 10px;text-align:center;font-size:12px;color:'+(app.pending?'var(--red)':'var(--t3)')+';font-weight:'+(app.pending?700:400)+'">'+(app.pending||'—')+'</td>'
-      +'</tr>';
-  });
-
-  // ── Metric cards ──
-  const metrics=[
-    {label:'Total Reconciliations',val:total.toLocaleString(),icon:'ti-clipboard-list',color:'var(--blue)',sub:'130 AREs · 24 FSLIs'},
-    {label:'Certified & Locked',val:cert.toLocaleString(),icon:'ti-shield-check',color:'var(--green)',sub:pctCert+'% complete'},
-    {label:'In Progress',val:inProg.toLocaleString(),icon:'ti-progress',color:'var(--blue)',sub:(total?Math.round(inProg/total*100):0)+'% of total'},
-    {label:'Not Started',val:notStarted.toLocaleString(),icon:'ti-clock',color:'var(--amber)',sub:(total?Math.round(notStarted/total*100):0)+'% of total'},
-    {label:'With Open Items',val:RDf.filter(r=>ST[r.id].openItems.length>0).length.toLocaleString(),icon:'ti-alert-circle',color:'var(--red)',sub:'Require resolution'},
-    {label:'Auto-Certify Eligible',val:RDf.filter(r=>ST[r.id].status!=='certified'&&checkAutoCertify(r)).length.toLocaleString(),icon:'ti-robot',color:'var(--green)',sub:'Zero balance / no movement'},
-  ];
-  let metricCards='';
-  metrics.forEach(m=>{
-    metricCards+='<div style="display:flex;align-items:center;gap:10px;padding:8px 10px;background:var(--bg);border:1px solid var(--b1);border-radius:var(--r)">'
-      +'<div style="width:32px;height:32px;border-radius:6px;background:'+m.color+'22;display:flex;align-items:center;justify-content:center;flex-shrink:0">'
-      +'<i class="ti '+m.icon+'" style="font-size:16px;color:'+m.color+'"></i></div>'
-      +'<div style="flex:1"><div style="font-size:11.5px;color:var(--t2)">'+m.label+'</div>'
-      +(m.sub?'<div style="font-size:10.5px;color:var(--t3)">'+m.sub+'</div>':'')+'</div>'
-      +'<div style="font-size:18px;font-weight:700;font-family:var(--mono);color:'+m.color+'">'+m.val+'</div>'
-      +'</div>';
-  });
-
-  // ── Assemble HTML ──
-  let html='';
-
-  // Page header
-  html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
-    +'<div><div style="font-size:16px;font-weight:700;color:var(--t1);display:flex;align-items:center;gap:8px">'
-    +'<i class="ti ti-layout-dashboard" style="color:var(--navy)"></i>Reconciliation Status Dashboard</div>'
-    +'<div style="font-size:12px;color:var(--t3);margin-top:2px">ARE 3000 · Jun 2026 · June 2026 · '+total.toLocaleString()+' reconciliations · 130 AREs · 24 FSLIs</div>'
-    +'</div>'
-    +'<div style="display:flex;gap:8px">'
-    +'<button class="btn btn-sm" onclick="renderStatusDash()"><i class="ti ti-refresh"></i>Refresh</button>'
-    +'<button class="btn btn-sm btn-navy" onclick="goPage(\'dash\',document.querySelector(\'[data-pg=dash]\'))"><i class="ti ti-table"></i>View List</button>'
-    +'</div></div>';
-
-  // Overall progress bar
-  html+='<div style="margin-bottom:14px;background:var(--card);border:1px solid var(--b1);border-radius:var(--r8);padding:14px 16px;box-shadow:var(--sh)">'
-    +'<div style="display:flex;justify-content:space-between;margin-bottom:8px;align-items:baseline">'
-    +'<span style="font-size:13px;font-weight:600;color:var(--t1)">Overall Completion — Jun 2026</span>'
-    +'<span style="font-size:22px;font-weight:700;font-family:var(--mono);color:'+(pctCert===100?'var(--green)':'var(--navy)')+'">'+pctCert+'%</span>'
-    +'</div>'
-    +'<div style="height:14px;background:var(--b1);border-radius:7px;overflow:hidden;position:relative">'
-    +'<div style="position:absolute;height:100%;background:var(--green);border-radius:7px;width:'+Math.round(cert/total*100)+'%;transition:width .5s;z-index:2"></div>'
-    +'<div style="position:absolute;height:100%;background:var(--blue);border-radius:7px;width:'+Math.round((cert+inProg)/total*100)+'%;opacity:.4;z-index:1"></div>'
-    +'</div>'
-    +'<div style="display:flex;gap:16px;margin-top:8px;font-size:11.5px">'
-    +'<span><span style="color:var(--green);font-weight:700">●</span> <span style="color:var(--t2)">'+cert+' certified</span></span>'
-    +'<span><span style="color:var(--blue);font-weight:700">●</span> <span style="color:var(--t2)">'+inProg+' in progress</span></span>'
-    +'<span><span style="color:var(--amber);font-weight:700">●</span> <span style="color:var(--t2)">'+notStarted+' not started</span></span>'
-    +'<span style="margin-left:auto;color:var(--t3)">Due: <strong style="color:var(--t1)">21 Jul 2026</strong></span>'
-    +'</div></div>';
-
-  // Row 1: donut + metrics
-  html+='<div class="sd-grid sd-row2" style="margin-bottom:14px">'
-    +'<div class="sd-card"><div class="sd-head"><div class="sd-title"><i class="ti ti-chart-donut-3"></i>Status Breakdown</div>'
-    +'<span style="font-size:11px;color:var(--t3)">Click segment to filter list</span></div>'
-    +'<div class="sd-body"><div class="status-ring-wrap">'
-    +'<div style="position:relative;flex-shrink:0">'
-    +donutSVG
-    +'<div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none">'
-    +'<div style="font-size:20px;font-weight:700;font-family:var(--mono);color:var(--t1)">'+pctCert+'%</div>'
-    +'<div style="font-size:10px;color:var(--t3)">certified</div>'
-    +'</div></div>'
-    +'<div class="ring-legend">'+legend+'</div>'
-    +'</div></div></div>'
-    +'<div class="sd-card"><div class="sd-head"><div class="sd-title"><i class="ti ti-report-analytics"></i>Period Metrics</div></div>'
-    +'<div class="sd-body" style="display:flex;flex-direction:column;gap:8px">'+metricCards+'</div></div>'
-    +'</div>';
-
-  // Row 2: Risk cards
-  html+='<div class="sd-grid sd-row3" style="margin-bottom:14px">'+riskCards+'</div>';
-
-  // Row 3: FSLI + ARE
-  html+='<div class="sd-grid sd-row2" style="margin-bottom:14px">'
-    +'<div class="sd-card"><div class="sd-head"><div class="sd-title"><i class="ti ti-list-check"></i>By FSLI — Certification Progress</div>'
-    +'<span style="font-size:11px;color:var(--t3)">Certified / Total</span></div>'
-    +'<div class="sd-body" style="max-height:360px;overflow-y:auto;padding:10px 15px">'+( fsliRows||'<div style="color:var(--t3);font-size:12px">No data</div>')+'</div></div>'
-    +'<div class="sd-card"><div class="sd-head"><div class="sd-title"><i class="ti ti-building"></i>By ARE — Certification Progress</div>'
-    +'<span style="font-size:11px;color:var(--t3)">Top 12 by volume</span></div>'
-    +'<div class="sd-body" style="max-height:360px;overflow-y:auto;padding:10px 15px">'+( areRows||'<div style="color:var(--t3);font-size:12px">No data</div>')+'</div></div>'
-    +'</div>';
-
-  // Row 4: Top diffs + Open item aging
-  html+='<div class="sd-grid sd-row2" style="margin-bottom:14px">'
-    +'<div class="sd-card"><div class="sd-head"><div class="sd-title"><i class="ti ti-alert-triangle"></i>Top Unidentified Differences</div>'
-    +'<span style="font-size:11px;color:var(--t3)">Highest absolute diff · click to open</span></div>'
-    +'<div class="sd-body" style="padding:0">'+topDiffTable+'</div></div>'
-    +'<div class="sd-card"><div class="sd-head"><div class="sd-title"><i class="ti ti-clock"></i>Open Items — Aging</div>'
-    +'<span style="font-size:11px;color:var(--t3)">'+Object.values(ST).reduce((s,v)=>s+v.openItems.length,0)+' total open items</span></div>'
-    +'<div class="sd-body">'+agingBars
-    +'<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--b1)">'
-    +'<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">By FSLI</div>'
-    +oiFsliRows+'</div></div></div>'
-    +'</div>';
-
-  // Row 5: Team workload (if assigned)
-  if(USERS.length){
-    html+='<div class="sd-card" style="margin-bottom:14px">'
-      +'<div class="sd-head"><div class="sd-title"><i class="ti ti-users"></i>Team Workload</div>'
-      +'<span style="font-size:11px;color:var(--t3)">'+USERS.length+' team members</span></div>'
-      +'<div class="sd-body" style="padding:0"><table class="assignee-tbl"><thead><tr>'
-      +'<th>Team Member</th><th style="text-align:center">Assigned</th><th style="text-align:center">Certified</th>'
-      +'<th>Progress</th><th style="text-align:center">Pending Review</th><th style="text-align:center">Pending Approval</th>'
-      +'</tr></thead><tbody>'
-      +(userRows||'<tr><td colspan="6" style="padding:16px;text-align:center;color:var(--t3)">No assignments yet</td></tr>')
-      +'</tbody></table></div></div>';
-  }
-
+  html+='</table></div>';
   wrap.innerHTML=html;
 }
 
@@ -5450,6 +5124,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
