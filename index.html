@@ -812,6 +812,7 @@ button{cursor:pointer}
 
 
 
+
 let isPrep=false,isRev=false,isApp=false,isAdm=false;
 let CURRENT_USER=null;
 let CURRID=null;
@@ -2409,6 +2410,7 @@ function setAcctTmpl(ak,idx,type){
     else if(!ast.scheduleRows.length){let   def=TMPL_DEFS[type];if(def){let   row={};def.cols.forEach(c=>{row[c.key]='';});ast.scheduleRows.push(row);}}
   }
   logAudit(CURRID,'Schedule template set ['+realAk.split('::')[1]+']: '+type);
+  if(AZ_MODE) sbSaveAcctState(realAk);
   renderRecForm();
 }
 function loadGLDump(ak){
@@ -2455,6 +2457,8 @@ function loadAPRef(ak){
   if(ST_ACCT[realAk].scheduleRows.length&&!confirm('Replace current schedule with AP reference data?'))return;
   ST_ACCT[realAk].scheduleRows=AP_REFERENCE.map(a=>({...a}));
   logAudit(CURRID,'AP reference loaded: '+AP_REFERENCE.length+' lines');
+  if(AZ_MODE) sbSaveAcctState(realAk);
+  scheduleSave(CURRID);
   renderRecForm();toast('Loaded '+AP_REFERENCE.length+' AP lines','ok');
 }
 function addAcctSchedRow(ak){let   realAk=ak.replace(/\\x27/g,"'");let   ast=ST_ACCT[realAk];if(!ast)return;let   def=TMPL_DEFS[ast.scheduleType];if(!def)return;let   row={};def.cols.forEach(c=>{row[c.key]='';});ast.scheduleRows.push(row);renderRecForm();}
@@ -5410,6 +5414,7 @@ window.testSPState=testSPState;
 window.testPANotification=testPANotification;
 window.selectSPRole=selectSPRole;
 window.bootApp=bootApp;
+
 
 
 
